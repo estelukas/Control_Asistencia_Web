@@ -9,48 +9,93 @@
     <title>Registro de Entrada/Salida</title>
     <!-- MDBootstrap CSS -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.0.0/mdb.min.css" rel="stylesheet">
+    <style>
+        /* Estilo adicional para asegurar mejor experiencia responsiva */
+        video {
+            max-width: 100%;
+            height: auto;
+        }
+
+        .card {
+            width: 100%;
+            max-width: 22rem;
+        }
+
+        .progress {
+            height: 20px;
+        }
+    </style>
 </head>
 <body class="bg-light">
     <div class="container d-flex flex-column align-items-center py-5">
-        <div class="text-center">
-            <img src="~/assets/images/logos/logo-4.png" alt="Logo" style="max-width: 150px;">
+
+        <!-- Botón para recargar permisos de cámara (alineado a la izquierda) -->
+        <div class="text-start mb-3">
+            <button id="recargarButton" class="btn btn-warning">Recargar Permisos</button>
         </div>
-        <div class="card mt-4" style="width: 22rem;">
+
+        <!-- Tarjeta principal -->
+        <div class="card">
             <div class="card-body text-center">
+
+                <!-- Logo -->
+                <div class="text-center mb-3">
+                    <img src="~/assets/images/logos/logo-4.png" alt="Logo" class="img-fluid" style="max-width: 250px;">
+                </div>
+
+                <!-- Título -->
+                <h3 class="text-center mb-3">Control de Asistencia</h3>
+
+                <!-- Video -->
                 <div class="mb-3">
-                    <img src="~/assets/images/logos/pngegg.png" alt="Foto de perfil" class="img-fluid rounded-circle" style="width: 150px; height: 150px;">
+                    <video id="video" autoplay></video>
                 </div>
+
+                <!-- Barra de progreso -->
                 <div class="progress mb-3">
-                    <div class="progress-bar" role="progressbar" style="width: 50%;" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
+                    <div class="progress-bar bg-success progress-bar-striped" role="progressbar"
+                         style="width: 50%;" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100">
+                        50%
+                    </div>
                 </div>
-                <div class="form-check form-switch d-flex justify-content-center mb-4">
-                    <input class="form-check-input" type="checkbox" id="entradaSalidaSwitch">
-                    <label class="form-check-label ms-2" for="entradaSalidaSwitch">Entrada/Salida</label>
+
+                <!-- Entrada/Salida con Radiobuttons -->
+                <div class="mb-4 text-center">
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="entradaSalidaOptions" id="entradaOption" value="entrada" checked>
+                        <label class="form-check-label" for="entradaOption">Entrada</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="entradaSalidaOptions" id="salidaOption" value="salida">
+                        <label class="form-check-label" for="salidaOption">Salida</label>
+                    </div>
                 </div>
+
+                <!-- Selector de empleado -->
                 <div class="mb-4">
                     <select class="form-select" aria-label="Seleccione empleado">
                         <option selected>Kevin</option>
                         <!-- Agregar más opciones según sea necesario -->
                     </select>
                 </div>
-                <button class="btn btn-success">Registrar</button>
+
+                <!-- Botón -->
+                <button class="btn btn-success w-100">Registrar</button>
+
+                <!-- Información de Entrada/Salida como botones -->
+                <div class="mt-4 text-center d-flex justify-content-center gap-3">
+                    <button type="button" class="btn btn-outline-success">Entrada: 08:35 A.M.</button>
+                    <button type="button" class="btn btn-outline-danger">Salida: 16:05 P.M.</button>
+                </div>
             </div>
         </div>
-        <div class="mt-4 text-center">
-            <p>Entrada: 08:35 A.M.</p>
-            <p>Salida: 16:05 P.M.</p>
-        </div>
     </div>
-    <!-- MDBootstrap JS -->
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.0.0/mdb.min.js"></script>
+
+    <div id="urlSeleccionarDatos" data-action-url="@Url.Action("Control_Asistencia_SeleccionarDatos", "ControlAsistencia")"></div>
+
+    <!-- Script -->
+    @section Scripts {
+        <script src="~/js/ControlAsistencia.js" asp-append-version="true"></script>
+    }
 </body>
 </html>
-
-
-<div id="urlSeleccionarDatos" data-action-url="@Url.Action("Control_Asistencia_SeleccionarDatos", "ControlAsistencia")"></div>
-
-<!-- Script -->
-@section Scripts {
-
-    <script src="~/js/ControlAsistencia.js" asp-append-version="true"></script>
-}
