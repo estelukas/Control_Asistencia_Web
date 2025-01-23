@@ -24,11 +24,29 @@
         background-color: #fff;
     }
 
-    video {
+ /*    video {
         width: 100%;
         height: auto;
         border-radius: 8px;
+    } */
+    .containerVideo {
+        position: relative;
+        display: inline-block;
     }
+
+    video, canvas {
+        display: block;
+        width: 100%;
+        height: auto;
+        transform: scaleX(-1);
+    }
+
+    canvas {
+        position: absolute;
+        top: 0;
+        left: 0;
+    }
+
 
     .progress {
         height: 25px;
@@ -64,7 +82,7 @@
     }
 
     .container {
-        max-width: 1200px; /* Aumentar el ancho máximo del contenedor */
+        max-width: 1000px; /* Aumentar el ancho máximo del contenedor */
     }
 
     /* Personaliza los estilos de la descripción secundaria */
@@ -80,10 +98,12 @@
         font-size: 0.9rem;
     }
 
+
+
 </style>
 
 <body class="bg-light">
-    <div id="divContenedorGps">
+    <div id="divContenedorGps" style="display:none">
         <div class="container d-flex flex-column align-items-center py-5">
             <div class="card">
                 <div class="card-body text-center">
@@ -98,7 +118,7 @@
             </div>
         </div>
     </div>
-    <div id="divContenedorCamara">
+    <div id="divContenedorCamara" style="display:none">
         <div class="container d-flex flex-column align-items-center py-5">
             <div class="card">
                 <div class="card-body text-center">
@@ -113,7 +133,7 @@
             </div>
         </div>
     </div>
-    <div id="divControlAsistencia">
+    <div id="divControlAsistencia" style="display:none">
         <div class="container d-flex flex-column align-items-center py-5">
             <!-- Tarjeta principal -->
             <div class="card">
@@ -128,7 +148,10 @@
 
                     <!-- Video -->
                     <div class="mb-3">
-                        <video id="video" autoplay></video>
+                        <div class="containerVideo">
+                            <video id="video" autoplay playsinline muted style="max-width:400px;border-radius:8px;"></video>
+                            <canvas id="canvas"></canvas>
+                        </div>
                     </div>
 
 
@@ -157,7 +180,7 @@
 
 
                     <!-- Botón -->
-                    <button class="btn btn-success w-100">Registrar</button>
+                    <button id="Registrar" class="btn btn-success w-100">Registrar</button>
 
                     <!-- Información de Entrada/Salida como botones -->
                     <div class="mt-4 text-center d-flex justify-content-center gap-3">
@@ -170,6 +193,7 @@
     </div>
 
     <div id="urlSeleccionarDatos" data-action-url="@Url.Action("Control_Asistencia_SeleccionarDatos", "ControlAsistencia")"></div>
+    <div id="urlGuardarFoto" data-action-url="@Url.Action("GuardarFoto", "ControlAsistencia")"></div>
 
     <!-- Script -->
     @section Scripts {
