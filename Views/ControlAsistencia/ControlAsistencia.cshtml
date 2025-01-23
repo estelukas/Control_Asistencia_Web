@@ -1,91 +1,169 @@
 ﻿@{
     Layout = "_Layout";
 }
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registro de Entrada/Salida</title>
-    <!-- MDBootstrap CSS -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.0.0/mdb.min.css" rel="stylesheet">
-    <style>
-        /* Estilo adicional para asegurar mejor experiencia responsiva */
-        video {
-            max-width: 100%;
-            height: auto;
-        }
 
-        .card {
-            width: 100%;
-            max-width: 22rem;
-        }
+<style>
+    body {
+        background-color: #f8f9fa; /* Fondo claro para una experiencia limpia */
+        font-family: Arial, sans-serif;
+    }
 
-        .progress {
-            height: 20px;
-        }
-    </style>
-</head>
+    .logo {
+        max-width: 300px; /* Tamaño máximo para pantallas grandes */
+        width: 100%; /* Asegura que la imagen se ajuste al 100% del contenedor */
+        height: auto;
+    }
+
+    .card {
+        width: 100%;
+        max-width: 45rem; /* Aumentamos el tamaño máximo de la tarjeta */
+        padding: 2rem;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        background-color: #fff;
+    }
+
+    video {
+        width: 100%;
+        height: auto;
+        border-radius: 8px;
+    }
+
+    .progress {
+        height: 25px;
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+    .progress-bar {
+        font-size: 0.9rem;
+        line-height: 25px;
+    }
+
+    .form-check-label {
+        font-size: 1.2rem;
+    }
+
+    .form-select {
+        font-size: 1.1rem;
+        padding: 0.6rem;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+    }
+
+    button {
+        font-size: 1.2rem;
+        padding: 0.75rem;
+        border-radius: 8px;
+    }
+
+    .info-text p {
+        font-size: 1.1rem;
+        margin: 0.5rem 0;
+    }
+
+    .container {
+        max-width: 1200px; /* Aumentar el ancho máximo del contenedor */
+    }
+
+    /* Personaliza los estilos de la descripción secundaria */
+    .selectpicker option[data-content] {
+        display: block;
+    }
+
+    .selectpicker .bs-searchbox input {
+        padding-left: 2em;
+    }
+
+    .text-muted {
+        font-size: 0.9rem;
+    }
+
+</style>
+
 <body class="bg-light">
-    <div class="container d-flex flex-column align-items-center py-5">
-
-        <!-- Botón para recargar permisos de cámara (alineado a la izquierda) -->
-        <div class="text-start mb-3">
-            <button id="recargarButton" class="btn btn-warning">Recargar Permisos</button>
+    <div id="divContenedorGps">
+        <div class="container d-flex flex-column align-items-center py-5">
+            <div class="card">
+                <div class="card-body text-center">
+                    <span>Activa los permisos de Ubicación por favor</span>
+                </div>
+                <div class="container d-flex flex-column align-items-center py-5">
+                    <!-- Botón para recargar permisos de cámara (alineado a la izquierda) -->
+                    <div class="text-start mb-3">
+                        <button id="recargarButtonGps" class="btn btn-warning">Refrescar Pagina</button>
+                    </div>
+                </div>
+            </div>
         </div>
-
-        <!-- Tarjeta principal -->
-        <div class="card">
-            <div class="card-body text-center">
-
-                <!-- Logo -->
-                <div class="text-center mb-3">
-                    <img src="~/assets/images/logos/logo-4.png" alt="Logo" class="img-fluid" style="max-width: 250px;">
+    </div>
+    <div id="divContenedorCamara">
+        <div class="container d-flex flex-column align-items-center py-5">
+            <div class="card">
+                <div class="card-body text-center">
+                    <span>Activa los permisos de la Cámara por favor</span>
                 </div>
-
-                <!-- Título -->
-                <h3 class="text-center mb-3">Control de Asistencia</h3>
-
-                <!-- Video -->
-                <div class="mb-3">
-                    <video id="video" autoplay></video>
-                </div>
-
-                <!-- Barra de progreso -->
-                <div class="progress mb-3">
-                    <div class="progress-bar bg-success progress-bar-striped" role="progressbar"
-                         style="width: 50%;" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100">
-                        50%
+                <div class="container d-flex flex-column align-items-center py-5">
+                    <!-- Botón para recargar permisos de cámara (alineado a la izquierda) -->
+                    <div class="text-start mb-3">
+                        <button id="recargarButtonCamara" class="btn btn-warning">Refrescar Pagina</button>
                     </div>
                 </div>
-
-                <!-- Entrada/Salida con Radiobuttons -->
-                <div class="mb-4 text-center">
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="entradaSalidaOptions" id="entradaOption" value="entrada" checked>
-                        <label class="form-check-label" for="entradaOption">Entrada</label>
+            </div>
+        </div>
+    </div>
+    <div id="divControlAsistencia">
+        <div class="container d-flex flex-column align-items-center py-5">
+            <!-- Tarjeta principal -->
+            <div class="card">
+                <div class="card-body text-center">
+                    <!-- Logo -->
+                    <div class="text-center mb-3">
+                        <img src="~/assets/images/logos/logo-4.png" alt="Logo" class="img-fluid logo">
                     </div>
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="entradaSalidaOptions" id="salidaOption" value="salida">
-                        <label class="form-check-label" for="salidaOption">Salida</label>
+
+                    <!-- Título -->
+                    <h4 class="text-center mb-3">Control de Asistencia</h4>
+
+                    <!-- Video -->
+                    <div class="mb-3">
+                        <video id="video" autoplay></video>
                     </div>
-                </div>
 
-                <!-- Selector de empleado -->
-                <div class="mb-4">
-                    <select class="form-select" aria-label="Seleccione empleado">
-                        <option selected>Kevin</option>
-                        <!-- Agregar más opciones según sea necesario -->
-                    </select>
-                </div>
 
-                <!-- Botón -->
-                <button class="btn btn-success w-100">Registrar</button>
+                    <!-- Entrada/Salida con Radiobuttons -->
+                    <div class="mb-4 text-center">
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="entradaSalidaOptions" id="entradaOption" value="entrada" checked>
+                            <label class="form-check-label" for="entradaOption">Entrada</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="entradaSalidaOptions" id="salidaOption" value="salida">
+                            <label class="form-check-label" for="salidaOption">Salida</label>
+                        </div>
+                    </div>
 
-                <!-- Información de Entrada/Salida como botones -->
-                <div class="mt-4 text-center d-flex justify-content-center gap-3">
-                    <button type="button" class="btn btn-outline-success">Entrada: 08:35 A.M.</button>
-                    <button type="button" class="btn btn-outline-danger">Salida: 16:05 P.M.</button>
+
+
+                    <div class="mb-3">
+                        <select id="Select_SearchEmpleado" data-mdb-select-init data-mdb-visible-options="5" data-mdb-filter="true" data-mdb-select-all="false" data-mdb-search-placeholder="Buscar..."
+                                data-mdb-no-result-text="Sin resultados">
+                        </select>
+                        <label class="form-label select-label" for="Select_SearchEmpleado" style="margin-left: 0px;">Clave Empleado</label>
+
+                    </div>
+
+
+
+                    <!-- Botón -->
+                    <button class="btn btn-success w-100">Registrar</button>
+
+                    <!-- Información de Entrada/Salida como botones -->
+                    <div class="mt-4 text-center d-flex justify-content-center gap-3">
+                        <button type="button" class="btn btn-outline-success">Entrada: 08:35 A.M.</button>
+                        <button type="button" class="btn btn-outline-danger">Salida: 16:05 P.M.</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -96,6 +174,7 @@
     <!-- Script -->
     @section Scripts {
         <script src="~/js/ControlAsistencia.js" asp-append-version="true"></script>
+
     }
 </body>
-</html>
+
