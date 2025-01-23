@@ -14,18 +14,96 @@
         height: auto;
     }
 
-        .card {
-            width: 100%;
-            max-width: 22rem;
-        }
+    .card {
+        width: 100%;
+        max-width: 45rem; /* Aumentamos el tamaño máximo de la tarjeta */
+        padding: 2rem;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        background-color: #fff;
+    }
 
-        .progress {
-            height: 20px;
-        }
-    </style>
-</head>
+ /*    video {
+        width: 100%;
+        height: auto;
+        border-radius: 8px;
+    } */
+    .containerVideo {
+        position: relative;
+        display: inline-block;
+    }
+
+    video, canvas {
+        display: block;
+        width: 100%;
+        height: auto;
+        transform: scaleX(-1);
+    }
+
+    canvas {
+        position: absolute;
+        top: 0;
+        left: 0;
+    }
+
+
+    .progress {
+        height: 25px;
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+    .progress-bar {
+        font-size: 0.9rem;
+        line-height: 25px;
+    }
+
+    .form-check-label {
+        font-size: 1.2rem;
+    }
+
+    .form-select {
+        font-size: 1.1rem;
+        padding: 0.6rem;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+    }
+
+    button {
+        font-size: 1.2rem;
+        padding: 0.75rem;
+        border-radius: 8px;
+    }
+
+    .info-text p {
+        font-size: 1.1rem;
+        margin: 0.5rem 0;
+    }
+
+    .container {
+        max-width: 1000px; /* Aumentar el ancho máximo del contenedor */
+    }
+
+    /* Personaliza los estilos de la descripción secundaria */
+    .selectpicker option[data-content] {
+        display: block;
+    }
+
+    .selectpicker .bs-searchbox input {
+        padding-left: 2em;
+    }
+
+    .text-muted {
+        font-size: 0.9rem;
+    }
+
+
+
+</style>
+
 <body class="bg-light">
-    <div id="divContenedorGps">
+    <div id="divContenedorGps" style="display:none">
         <div class="container d-flex flex-column align-items-center py-5">
             <div class="card">
                 <div class="card-body text-center">
@@ -40,7 +118,7 @@
             </div>
         </div>
     </div>
-    <div id="divContenedorCamara">
+    <div id="divContenedorCamara" style="display:none">
         <div class="container d-flex flex-column align-items-center py-5">
             <div class="card">
                 <div class="card-body text-center">
@@ -55,7 +133,7 @@
             </div>
         </div>
     </div>
-    <div id="divControlAsistencia">
+    <div id="divControlAsistencia" style="display:none">
         <div class="container d-flex flex-column align-items-center py-5">
             <!-- Tarjeta principal -->
             <div class="card">
@@ -68,18 +146,14 @@
                     <!-- Título -->
                     <h4 class="text-center mb-3">Control de Asistencia</h4>
 
-                <!-- Video -->
-                <div class="mb-3">
-                    <video id="video" autoplay></video>
-                </div>
-
-                <!-- Barra de progreso -->
-                <div class="progress mb-3">
-                    <div class="progress-bar bg-success progress-bar-striped" role="progressbar"
-                         style="width: 50%;" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100">
-                        50%
+                    <!-- Video -->
+                    <div class="mb-3">
+                        <div class="containerVideo">
+                            <video id="video" autoplay playsinline muted style="max-width:400px;border-radius:8px;"></video>
+                            <canvas id="canvas"></canvas>
+                        </div>
                     </div>
-                </div>
+
 
                     <!-- Entrada/Salida con Radiobuttons -->
                     <div class="mb-4 text-center">
@@ -106,7 +180,7 @@
 
 
                     <!-- Botón -->
-                    <button class="btn btn-success w-100">Registrar</button>
+                    <button id="Registrar" class="btn btn-success w-100">Registrar</button>
 
                     <!-- Información de Entrada/Salida como botones -->
                     <div class="mt-4 text-center d-flex justify-content-center gap-3">
@@ -119,8 +193,8 @@
     </div>
 
     <div id="urlSeleccionarDatos" data-action-url="@Url.Action("Control_Asistencia_SeleccionarDatos", "ControlAsistencia")"></div>
-    <div id="urlCompararFotos" data-action-url="@Url.Action("CompararRostro", "ControlAsistencia")"></div>
-    
+    <div id="urlGuardarFoto" data-action-url="@Url.Action("GuardarFoto", "ControlAsistencia")"></div>
+
     <!-- Script -->
     @section Scripts {
         <script src="~/js/ControlAsistencia.js" asp-append-version="true"></script>
