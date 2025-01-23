@@ -26,7 +26,7 @@ namespace XCF_Web_Control_Asistencia.Controllers.ControlAsistencia
         #endregion
 
         /// <summary>
-        /// Consultar Datos de Tabla SAT_Regimen_Fiscal
+        /// Consultar Datos de empleados
         /// </summary>
         /// <returns>Json</returns>
         [HttpPost]
@@ -43,5 +43,25 @@ namespace XCF_Web_Control_Asistencia.Controllers.ControlAsistencia
                 return BadRequest("Ocurrió un error, vuelve a intentarlo.");
             }
         }
+        #region comparacionFotos
+        /// <summary>
+        /// Consultar si los dos rostros se parecen
+        /// </summary>
+        /// <returns>Json</returns>
+        [HttpPost]
+        public IActionResult CompararRostro([FromBody] mIdUsuario model)
+        {
+            try
+            {
+                mSelect r = _apiHandler.PostAsync<mIdUsuario, mSelect>(_apiHandler.UrlControlAsistencia + "controlasistencia/CompararRostro", model).Result;
+
+                return Json(r);
+            }
+            catch (Exception)
+            {
+                return BadRequest("Ocurrió un error, vuelve a intentarlo.");
+            }
+        }
+        #endregion compracionFotos
     }
 }
