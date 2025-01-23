@@ -4,11 +4,18 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] Control Asistencia</title>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/XCF_Web_Control_Asistencia.styles.css" asp-append-version="true" />
-    <script src="~/lib/fotos/tfjs.js"></script>
-    <script src="~/lib/fotos/blazeface.js"></script>
+    <!-- Evitar traducción automática -->
+    <meta name="google" content="notranslate">
+
+    <!-- Inclusión de la librería jQuery -->
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+
+    <!-- MDB ESSENTIAL -->
+    <link rel="stylesheet" href="~/lib/mdbpro/css/mdb.min.css" />
+    <!-- MDB PLUGINS -->
+    <link rel="stylesheet" href="~/lib/mdbpro/plugins/css/all.min.css" />
+
+
     <!-- Configuración básica de la página -->
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -21,10 +28,19 @@
             @RenderBody()
         </main>
     </div>
-
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
+    <!-- Inclusión de scripts de validación jQuery -->
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+
+    <!-- MDB ESSENTIAL -->
+    <script src="~/lib/mdbpro/js/mdb.umd.min.js?v=3"></script>
+
+    <!-- MDB PLUGINS -->
+    <script src="~/lib/mdbpro/plugins/js/all.min.js"></script>
+
+
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

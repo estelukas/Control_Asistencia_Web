@@ -1,31 +1,18 @@
 ﻿@{
     Layout = "_Layout";
 }
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registro de Entrada/Salida</title>
-   
-    <style>
-        .container {
-            position: relative;
-            display: inline-block;
-        }
 
-        video, canvas {
-            display: block;
-            width: 100%;
-            height: auto;
-            transform: scaleX(-1);
-        }
+<style>
+    body {
+        background-color: #f8f9fa; /* Fondo claro para una experiencia limpia */
+        font-family: Arial, sans-serif;
+    }
 
-        canvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-        }
+    .logo {
+        max-width: 300px; /* Tamaño máximo para pantallas grandes */
+        width: 100%; /* Asegura que la imagen se ajuste al 100% del contenedor */
+        height: auto;
+    }
 
         .card {
             width: 100%;
@@ -35,73 +22,97 @@
         .progress {
             height: 20px;
         }
-
-       
     </style>
 </head>
 <body class="bg-light">
-    <div class="container d-flex flex-column align-items-center py-5">
-
-        <!-- Botón para recargar permisos de cámara (alineado a la izquierda) -->
-        <div class="text-start mb-3">
-            <button id="recargarButton" class="btn btn-warning">Recargar Permisos</button>
-        </div>
-
-        <!-- Tarjeta principal -->
-        <div class="card">
-            <div class="card-body text-center">
-
-                <!-- Logo -->
-                <div class="text-center mb-3">
-                    <img src="~/assets/images/logos/logo-4.png" alt="Logo" class="img-fluid" style="max-width: 250px;">
+    <div id="divContenedorGps">
+        <div class="container d-flex flex-column align-items-center py-5">
+            <div class="card">
+                <div class="card-body text-center">
+                    <span>Activa los permisos de Ubicación por favor</span>
                 </div>
+                <div class="container d-flex flex-column align-items-center py-5">
+                    <!-- Botón para recargar permisos de cámara (alineado a la izquierda) -->
+                    <div class="text-start mb-3">
+                        <button id="recargarButtonGps" class="btn btn-warning">Refrescar Pagina</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="divContenedorCamara">
+        <div class="container d-flex flex-column align-items-center py-5">
+            <div class="card">
+                <div class="card-body text-center">
+                    <span>Activa los permisos de la Cámara por favor</span>
+                </div>
+                <div class="container d-flex flex-column align-items-center py-5">
+                    <!-- Botón para recargar permisos de cámara (alineado a la izquierda) -->
+                    <div class="text-start mb-3">
+                        <button id="recargarButtonCamara" class="btn btn-warning">Refrescar Pagina</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="divControlAsistencia">
+        <div class="container d-flex flex-column align-items-center py-5">
+            <!-- Tarjeta principal -->
+            <div class="card">
+                <div class="card-body text-center">
+                    <!-- Logo -->
+                    <div class="text-center mb-3">
+                        <img src="~/assets/images/logos/logo-4.png" alt="Logo" class="img-fluid logo">
+                    </div>
 
-                <!-- Título -->
-                <h3 class="text-center mb-3">Control de Asistencia</h3>
+                    <!-- Título -->
+                    <h4 class="text-center mb-3">Control de Asistencia</h4>
 
                 <!-- Video -->
                 <div class="mb-3">
-                    <div class="container">
-                        <video id="video" autoplay playsinline muted></video>
-                        <canvas id="canvas"></canvas>
-                    </div>
+                    <video id="video" autoplay></video>
                 </div>
 
                 <!-- Barra de progreso -->
                 <div class="progress mb-3">
-                    <div id="Progressbar" class="progress-bar bg-success progress-bar-striped" role="progressbar"
+                    <div class="progress-bar bg-success progress-bar-striped" role="progressbar"
                          style="width: 50%;" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100">
                         50%
                     </div>
                 </div>
 
-                <!-- Entrada/Salida con Radiobuttons -->
-                <div class="mb-4 text-center">
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="entradaSalidaOptions" id="entradaOption" value="entrada" checked>
-                        <label class="form-check-label" for="entradaOption">Entrada</label>
+                    <!-- Entrada/Salida con Radiobuttons -->
+                    <div class="mb-4 text-center">
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="entradaSalidaOptions" id="entradaOption" value="entrada" checked>
+                            <label class="form-check-label" for="entradaOption">Entrada</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="entradaSalidaOptions" id="salidaOption" value="salida">
+                            <label class="form-check-label" for="salidaOption">Salida</label>
+                        </div>
                     </div>
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="entradaSalidaOptions" id="salidaOption" value="salida">
-                        <label class="form-check-label" for="salidaOption">Salida</label>
+
+
+
+                    <div class="mb-3">
+                        <select id="Select_SearchEmpleado" data-mdb-select-init data-mdb-visible-options="5" data-mdb-filter="true" data-mdb-select-all="false" data-mdb-search-placeholder="Buscar..."
+                                data-mdb-no-result-text="Sin resultados" data-mdb-clear-button="true">
+                        </select>
+                        <label class="form-label select-label" for="Select_SearchEmpleado" style="margin-left: 0px;">Clave Empleado</label>
+
                     </div>
-                </div>
 
-                <!-- Selector de empleado -->
-                <div class="mb-4">
-                    <select class="form-select" aria-label="Seleccione empleado">
-                        <option selected>Kevin</option>
-                        <!-- Agregar más opciones según sea necesario -->
-                    </select>
-                </div>
 
-                <!-- Botón -->
-                <button class="btn btn-success w-100">Registrar</button>
 
-                <!-- Información de Entrada/Salida como botones -->
-                <div class="mt-4 text-center d-flex justify-content-center gap-3">
-                    <button type="button" class="btn btn-outline-success">Entrada: 08:35 A.M.</button>
-                    <button type="button" class="btn btn-outline-danger">Salida: 16:05 P.M.</button>
+                    <!-- Botón -->
+                    <button class="btn btn-success w-100">Registrar</button>
+
+                    <!-- Información de Entrada/Salida como botones -->
+                    <div class="mt-4 text-center d-flex justify-content-center gap-3">
+                        <button type="button" class="btn btn-outline-success">Entrada: 08:35 A.M.</button>
+                        <button type="button" class="btn btn-outline-danger">Salida: 16:05 P.M.</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -113,6 +124,7 @@
     <!-- Script -->
     @section Scripts {
         <script src="~/js/ControlAsistencia.js" asp-append-version="true"></script>
+
     }
 </body>
-</html>
+
