@@ -134,7 +134,7 @@ const EmpleadoConsultarDatosSelectData = async (searchTerm = "") => {
             },
             body: JSON.stringify({
                 IdUsuario: 36, // Cambia esto por el Id del usuario
-                ParametroBusqueda: searchTerm  // Pasar el término de búsqueda
+                ParametroBusqueda: searchTerm // Pasar el término de búsqueda
             })
         });
 
@@ -158,7 +158,7 @@ const EmpleadoConsultarDatosSelectData = async (searchTerm = "") => {
                 });
 
                 // Llamar a la función para llenar el select
-                fillSelectDefaultHidden('#empleadoSelect', optionsArray);
+                fillMDBSelect('#Select_SearchEmpleado', optionsArray);
             } else {
                 console.error("Error en los datos del servidor");
             }
@@ -170,43 +170,59 @@ const EmpleadoConsultarDatosSelectData = async (searchTerm = "") => {
         console.error("Error: ", error);
     }
 };
-
 // Event listener para el cambio en el input de búsqueda
-$('#searchEmpleado').on('input', function () {
-    // Llamar a la función para obtener los empleados que coincidan con la búsqueda
-    const searchTerm = $(this).val().trim(); // Obtener valor escrito por el usuario
+$(document).on('input', '.form-control.select-filter-input', function () {
+    const searchTerm = $(this).val().trim(); // Captura el texto que se escribe en el buscador
+
+    // Llama a la función de búsqueda dinámica
     EmpleadoConsultarDatosSelectData(searchTerm);
 });
 
+// Manejar la selección de un empleado en el dropdown
+$('#Select_SearchEmpleado').on('change', function () {
+    const selectedValue = $(this).val(); // Obtén el valor seleccionado
+    const selectedText = $(this).find(':selected').text(); // Obtén el texto seleccionado
+    console.log('Empleado seleccionado:', selectedValue, selectedText);
+
+    // Aquí puedes manejar el evento cuando se selecciona un empleado
+});
+
+// Desactivar el comportamiento de sincronización automática del input visible con el campo de búsqueda
+$(document).on('click', '.select-option', function (e) {
+    e.stopPropagation(); // Prevenir que el clic actualice automáticamente el input visible
+});
+
+
 //#endregion
 
-function fillSelectDefaultHidden(id, optionsArray) {
-    let selectElement = $(id);
-    selectElement.empty();
+//#region fillMDBSelect
 
-    if (optionsArray.length === 0) {
-        let defaultOption = document.createElement("option");
-        defaultOption.value = 0;
-        defaultOption.text = "Sin datos";
-        defaultOption.classList.add("hidden", "selected", "text-secondary");
-        defaultOption.hidden = true;
-        selectElement.append(defaultOption);
-        selectElement.prop('disabled', true);
-    } else {
-        let defaultOption = document.createElement("option");
-        defaultOption.value = "";
-        defaultOption.text = "Seleccionar";
-        defaultOption.classList.add("hidden", "selected", "text-secondary");
-        defaultOption.hidden = true;
-        selectElement.append(defaultOption);
+// Función para llenar el select con MDBootstrap
+function fillMDBSelect(id, optionsArray) {
+    const selectElement = $(id);
+    selectElement.empty(); // Limpia las opciones actuales
 
-        for (const element of optionsArray) {
-            let option = $("<option>")
-                .val(element[0])
-                .text(element[1]);
-            if (element[2]) option.attr('data-mdb-secondary-text', element[2]);
-            selectElement.append(option);
-        }
-        selectElement.prop('disabled', false);
-    }
-}
+    // Agrega la opción por defecto
+    selectElement.append(
+        $('<option>', {
+            value: "",
+            text: "Seleccionar",
+            class: "hidden text-secondary",
+            hidden: true,
+        })
+    );
+
+    // Agrega las opciones dinámicas
+    optionsArray.forEach(([value, mainText, secondaryText]) => {
+        const optionElement = $('<option>', {
+            value: value,
+            text: mainText,
+            'data-mdb-secondary-text': secondaryText, // Usa atributo específico de MDB para texto secundario
+        });
+        selectElement.append(optionElement);
+    });
+
+    // Actualiza el select de MDBootstrap para aplicar los cambios
+    selectElement.mdbSelect('destroy'); // Destruye el select actual
+    selectElement.mdbSelect(); // Inicializa el select nuevamente
+}//#endregion fillMDBSelect
