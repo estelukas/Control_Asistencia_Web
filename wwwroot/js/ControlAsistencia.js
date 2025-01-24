@@ -1,5 +1,7 @@
 ﻿//#region Carga Inicial
-
+let jsonResponse = [];
+let EstaEnGeocerca=0;
+let IdCentroServicio=0;
 $(document).ready(() => {
     $('#divContenedorCamara').hide();
     $('#divControlAsistencia').hide();
@@ -13,27 +15,42 @@ $(document).ready(() => {
 //#region Funciones de Permisos
 
 // Solicitar permisos de ubicación
-const solicitarPermisoUbicacion = () => {
+const solicitarPermisoUbicacion = async () => {
     if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-            (position) => {
-                // Ocultar el div de permiso de GPS y proceder a solicitar permisos de cámara
-                $('#divContenedorGps').hide();               
+        try {
+            // Convertimos getCurrentPosition en una Promesa
+            const position = await new Promise((resolve, reject) => {
+                navigator.geolocation.getCurrentPosition(resolve, reject);
+            });
+
+            // Llamamos a ConsultarGeocerca con await
+            await ConsultarGeocerca(position.coords.latitude, position.coords.longitude);
+
+            if (EstaEnGeocerca == 1) {
+                $('#divContenedorGps').hide();
                 $('#divContenedorCamara').show();
                 solicitarPermisoCamara();
-            },
-            (error) => {
-                // Mostrar el div de GPS si los permisos no son otorgados o están en espera
-                if (error.code === error.PERMISSION_DENIED) {
-                    $('#divContenedorGps').show();
-                }
+            } else {
+                $('#divContenedorGps').show();
+                $('#divContenedorCamara').hide();
+                alert('No estás en una geocerca válida');
             }
-        );
+        } catch (error) {
+            console.error("Error al obtener la ubicación:", error);
+            // Mostrar el div de GPS si ocurre un error o se deniega el permiso
+            if (error.code === error.PERMISSION_DENIED) {
+                $('#divContenedorGps').show();
+            } else {
+                alert("Error al intentar obtener la ubicación.");
+                $('#divContenedorGps').show();
+            }
+        }
     } else {
         alert("Tu navegador no soporta la geolocalización.");
         $('#divContenedorGps').show();
     }
-}
+};
+
 
 // Solicitar permisos de cámara
 const solicitarPermisoCamara = () => {
@@ -266,17 +283,16 @@ function fillMDBSelect(id, optionsArray) {
         selectElement.append(defaultOption);
 
         // Agregar las opciones dinámicamente
-        for (const element of optionsArray) {
-            let option = $("<option>")
-                .val(element[0])
-                .text(element[1])
-                .addClass("");
-            if (element[2]) {
-                option.attr("data-mdb-secondary-text", element[2]);
-            }
-
+        optionsArray.forEach(([value, mainText, secondaryText]) => {
+       
+            const option = $("<option>", {
+                value: value,
+                text: secondaryText,
+                'data-mdb-secondary-text': 'Centro de Servicio ' + mainText.split('Centro de Servicio')[1]
+        });
+                
             selectElement.append(option);
-        }
+    });
 
         selectElement.prop("disabled", false);
     }
@@ -336,3 +352,44 @@ const capturarImagen = async () => {
 };
 //#endregion tomar foto y guardar en ftp//#endregion tomar foto y guardar en ftp
 
+//#region ValidarGeocerca
+
+const ConsultarGeocerca = async (latitud,longuitud) => {
+    try {
+        //latitud = '25.803844';
+        //longuitud = '-100.275934';
+        console.log(latitud, longuitud);
+        const response = await fetch($("#urlValidarGeocerca").data("action-url"), {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                Longuitud: longuitud.toString(), // Cambia esto por el Id del usuario
+                Latitud: latitud.toString() // Pasar el término de búsqueda
+            })
+        });
+
+        if (response.ok) {
+            // Obtener el JSON de la respuesta
+            let jsonObject = await response.json();
+            if (jsonObject.id == 1) {               
+                let json = JSON.parse(jsonObject.contenido);
+                jsonResponse = json.ValidarCobertura;
+                if (jsonResponse.length > 0) {
+                    EstaEnGeocerca = 1;
+                    IdCentroServicio = jsonResponse[0].id;
+                } else {
+                    EstaEnGeocerca = 0;
+                    IdCentroServicio = null;
+                }                
+            } 
+        } else {
+            const errorMessage = await response.text();
+            throw new Error("Error en la solicitud: " + errorMessage);
+        }
+    } catch (error) {
+        console.error("Error: ", error);
+    }
+};
+//#endregion
