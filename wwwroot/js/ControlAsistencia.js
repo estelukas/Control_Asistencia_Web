@@ -378,7 +378,7 @@ const ConsultarGeocerca = async (latitud,longuitud) => {
                 jsonResponse = json.ValidarCobertura;
                 if (jsonResponse.length > 0) {
                     EstaEnGeocerca = 1;
-                    IdCentroServicio = jsonResponse[0].id;
+                    IdCentroServicio = jsonResponse[0].Id;
                 } else {
                     EstaEnGeocerca = 0;
                     IdCentroServicio = null;
