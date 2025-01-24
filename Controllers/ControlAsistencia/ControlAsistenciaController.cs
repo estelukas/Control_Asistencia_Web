@@ -3,6 +3,7 @@ using XCF_Web.Models.Genericos;
 using XCF_Web_Control_Asistencia.Classes;
 using XCF_Web_Control_Asistencia.Classes.Attributes;
 using XCF_Web_Control_Asistencia.Models.Genericos;
+using XCF_Web_Control_Asistencia.Models.Geocerca;
 using XCF_Web_Control_Asistencia.Models.Imagenes;
 
 namespace XCF_Web_Control_Asistencia.Controllers.ControlAsistencia
@@ -121,11 +122,11 @@ namespace XCF_Web_Control_Asistencia.Controllers.ControlAsistencia
         /// </summary>
         /// <returns>Json</returns>
         [HttpPost]
-        public IActionResult Control_Asistencia_ValidarGeocerca([FromBody] mIdUsuario model)
+        public IActionResult Control_Asistencia_ValidarGeocerca([FromBody] mUbicacion model)
         {
             try
             {
-                mSelect r = _apiHandler.PostAsync<mIdUsuario, mSelect>(_apiHandler.UrlControlAsistencia + "controlasistencia/Control_Asistencia_ValidarGeocerca", model).Result;
+                mSelect r = _apiHandler.PostAsync<mUbicacion, mSelect>(_apiHandler.UrlControlAsistencia + "controlasistencia/Control_Asistencia_ValidarGeocerca", model).Result;
 
                 return Json(r);
             }
