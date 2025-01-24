@@ -19,7 +19,7 @@ const solicitarPermisoUbicacion = () => {
             (position) => {
                 // Ocultar el div de permiso de GPS y proceder a solicitar permisos de cámara
                 $('#divContenedorGps').hide();               
-               // $('#divContenedorCamara').show();
+                $('#divContenedorCamara').show();
                 solicitarPermisoCamara();
             },
             (error) => {
@@ -282,10 +282,8 @@ function fillMDBSelect(id, optionsArray) {
     }
 }
 
-}
 
 //#endregion fillMDBSelect
-
 
 //#region tomar foto y guardar en ftp
 const capturarImagen = async () => {
