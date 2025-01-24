@@ -1,6 +1,9 @@
 ﻿//#region Carga Inicial
 
-$(document).ready(() => {   
+$(document).ready(() => {
+    $('#divContenedorCamara').hide();
+    $('#divControlAsistencia').hide();
+
     // Inicia el flujo solicitando permisos de ubicación
     solicitarPermisoUbicacion();
 });
@@ -16,7 +19,7 @@ const solicitarPermisoUbicacion = () => {
             (position) => {
                 // Ocultar el div de permiso de GPS y proceder a solicitar permisos de cámara
                 $('#divContenedorGps').hide();               
-               // $('#divContenedorCamara').show();
+                $('#divContenedorCamara').show();
                 solicitarPermisoCamara();
             },
             (error) => {
@@ -230,42 +233,57 @@ $(document).on('click', '.select-option', function (e) {
     e.stopPropagation(); // Prevenir que el clic actualice automáticamente el input visible
 });
 
-//#endregion Eventos del Select_SearchEmpleado
+
+//#endregion
 
 //#region fillMDBSelect
 
 // Función para llenar el select con MDBootstrap
 function fillMDBSelect(id, optionsArray) {
-    const selectElement = $(id);
-    selectElement.empty(); // Limpia las opciones actuales
+    var selectElement = $(id); // Seleccionar el elemento
+    const selectInstance = mdb.Select.getInstance(selectElement[0]); // Obtener instancia actual
 
-    // Agrega la opción por defecto
-    selectElement.append(
-        $('<option>', {
+    selectElement.empty(); // Vaciar el contenido del select
+
+    if (optionsArray.length === 0) {
+        // Si no hay datos, agregar opción predeterminada
+        let defaultOption = $("<option>", {
+            value: 0,
+            text: "Sin datos",
+            hidden: true,
+            class: "hidden selected text-secondary"
+        });
+        selectElement.append(defaultOption);
+        selectElement.prop("disabled", true);
+    } else {
+        // Agregar la opción predeterminada
+        let defaultOption = $("<option>", {
             value: "",
             text: "Seleccionar",
-            class: "hidden text-secondary",
             hidden: true,
-        })
-    );
-
-    // Agrega las opciones dinámicas
-    optionsArray.forEach(([value, mainText, secondaryText]) => {
-        const optionElement = $('<option>', {
-            value: value,
-            text: secondaryText,
-            'data-mdb-secondary-text': 'Centro de Servicio ' + mainText.split('Centro de Servicio')[1] // Usa atributo específico de MDB para texto secundario
+            class: "hidden selected text-secondary"
         });
-        selectElement.append(optionElement);
-    });
+        selectElement.append(defaultOption);
 
-    // Actualiza el select de MDBootstrap para aplicar los cambios
-    selectElement.mdbSelect('destroy'); // Destruye el select actual
-    selectElement.mdbSelect(); // Inicializa el select nuevamente
+        // Agregar las opciones dinámicamente
+        for (const element of optionsArray) {
+            let option = $("<option>")
+                .val(element[0])
+                .text(element[1])
+                .addClass("");
+            if (element[2]) {
+                option.attr("data-mdb-secondary-text", element[2]);
+            }
+
+            selectElement.append(option);
+        }
+
+        selectElement.prop("disabled", false);
+    }
 }
 
-//#endregion fillMDBSelect
 
+//#endregion fillMDBSelect
 
 //#region tomar foto y guardar en ftp
 const capturarImagen = async () => {
@@ -316,4 +334,5 @@ const capturarImagen = async () => {
         alert('No se pudo guardar la imagen.');
     }
 };
-//#endregion tomar foto y guardar en ftp
+//#endregion tomar foto y guardar en ftp//#endregion tomar foto y guardar en ftp
+
