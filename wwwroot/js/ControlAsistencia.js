@@ -17,6 +17,7 @@ const solicitarPermisoUbicacion = () => {
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
             (position) => {
+                permisosUbicacion = true;
                 console.log("Ubicación obtenida:", position);
 
                 // Ocultar el div de permiso de GPS y proceder a solicitar permisos de cámara
@@ -45,7 +46,7 @@ const solicitarPermisoCamara = () => {
         navigator.mediaDevices
             .getUserMedia({ video: true }) // Solicitar acceso a la cámara
             .then((stream) => {
-                console.log("Acceso a la cámara otorgado.");
+                permisosCamara = true;
 
                 // Asignar el flujo de video al elemento <video>
                 const videoElement = document.getElementById('video');
@@ -170,12 +171,18 @@ const EmpleadoConsultarDatosSelectData = async (searchTerm = "") => {
         console.error("Error: ", error);
     }
 };
+//#endregion
+
+//#region Eventos del Select_SearchEmpleado
+
 // Event listener para el cambio en el input de búsqueda
 $(document).on('input', '.form-control.select-filter-input', function () {
-    const searchTerm = $(this).val().trim(); // Captura el texto que se escribe en el buscador
+    const searchTerm = $(this).val().trim(); // Captura el texto del buscador
 
-    // Llama a la función de búsqueda dinámica
-    EmpleadoConsultarDatosSelectData(searchTerm);
+    // Verifica si el texto tiene al menos 4 caracteres
+    if (searchTerm.length >= 4) {
+        EmpleadoConsultarDatosSelectData(searchTerm); // Llama a la función de búsqueda
+    }
 });
 
 // Manejar la selección de un empleado en el dropdown
@@ -192,37 +199,53 @@ $(document).on('click', '.select-option', function (e) {
     e.stopPropagation(); // Prevenir que el clic actualice automáticamente el input visible
 });
 
-
-//#endregion
+//#endregion Eventos del Select_SearchEmpleado
 
 //#region fillMDBSelect
 
 // Función para llenar el select con MDBootstrap
 function fillMDBSelect(id, optionsArray) {
-    const selectElement = $(id);
-    selectElement.empty(); // Limpia las opciones actuales
+    var selectElement = $(id); // Seleccionar el elemento
+    const selectInstance = mdb.Select.getInstance(selectElement[0]); // Obtener instancia actual
 
-    // Agrega la opción por defecto
-    selectElement.append(
-        $('<option>', {
+    selectElement.empty(); // Vaciar el contenido del select
+
+    if (optionsArray.length === 0) {
+        // Si no hay datos, agregar opción predeterminada
+        let defaultOption = $("<option>", {
+            value: 0,
+            text: "Sin datos",
+            hidden: true,
+            class: "hidden selected text-secondary"
+        });
+        selectElement.append(defaultOption);
+        selectElement.prop("disabled", true);
+    } else {
+        // Agregar la opción predeterminada
+        let defaultOption = $("<option>", {
             value: "",
             text: "Seleccionar",
-            class: "hidden text-secondary",
             hidden: true,
-        })
-    );
-
-    // Agrega las opciones dinámicas
-    optionsArray.forEach(([value, mainText, secondaryText]) => {
-        const optionElement = $('<option>', {
-            value: value,
-            text: mainText,
-            'data-mdb-secondary-text': secondaryText, // Usa atributo específico de MDB para texto secundario
+            class: "hidden selected text-secondary"
         });
-        selectElement.append(optionElement);
-    });
+        selectElement.append(defaultOption);
 
-    // Actualiza el select de MDBootstrap para aplicar los cambios
-    selectElement.mdbSelect('destroy'); // Destruye el select actual
-    selectElement.mdbSelect(); // Inicializa el select nuevamente
-}//#endregion fillMDBSelect
+        // Agregar las opciones dinámicamente
+        for (const element of optionsArray) {
+            let option = $("<option>")
+                .val(element[0])
+                .text(element[1])
+                .addClass("");
+            if (element[2]) {
+                option.attr("data-mdb-secondary-text", element[2]);
+            }
+
+            selectElement.append(option);
+        }
+
+        selectElement.prop("disabled", false);
+    }
+}
+
+
+//#endregion fillMDBSelect

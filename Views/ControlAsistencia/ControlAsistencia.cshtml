@@ -80,94 +80,110 @@
         font-size: 0.9rem;
     }
 
+    .select-option {
+        /*Quitar la altura fija a la plantilla de mdb.*/
+        height: unset !important;
+        min-height: 38px;
+        white-space: normal !important;
+        text-overflow: unset !important;
+        overflow: unset !important;
+    }
+
+    .select-option-text {
+        padding-top: 3px !important;
+    }
+
+    .select-option-secondary-text {
+        padding-bottom: 6px !important;
+/*         color: #3b71ca90 !important;
+ */    }
+
 </style>
 
 <body class="bg-light">
-    <div id="divContenedorGps">
-        <div class="container d-flex flex-column align-items-center py-5">
-            <div class="card">
-                <div class="card-body text-center">
-                    <span>Activa los permisos de Ubicación por favor</span>
-                </div>
-                <div class="container d-flex flex-column align-items-center py-5">
-                    <!-- Botón para recargar permisos de cámara (alineado a la izquierda) -->
-                    <div class="text-start mb-3">
-                        <button id="recargarButtonGps" class="btn btn-warning">Refrescar Pagina</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div id="divContenedorCamara">
-        <div class="container d-flex flex-column align-items-center py-5">
-            <div class="card">
-                <div class="card-body text-center">
-                    <span>Activa los permisos de la Cámara por favor</span>
-                </div>
-                <div class="container d-flex flex-column align-items-center py-5">
-                    <!-- Botón para recargar permisos de cámara (alineado a la izquierda) -->
-                    <div class="text-start mb-3">
-                        <button id="recargarButtonCamara" class="btn btn-warning">Refrescar Pagina</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div id="divControlAsistencia">
-        <div class="container d-flex flex-column align-items-center py-5">
-            <!-- Tarjeta principal -->
-            <div class="card">
-                <div class="card-body text-center">
-                    <!-- Logo -->
-                    <div class="text-center mb-3">
-                        <img src="~/assets/images/logos/logo-4.png" alt="Logo" class="img-fluid logo">
-                    </div>
 
-                    <!-- Título -->
-                    <h4 class="text-center mb-3">Control de Asistencia</h4>
+        <div id="divContenedorGps">
+            <div class="container d-flex flex-column align-items-center py-5">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <span>Activa los permisos de la Ubicación por favor</span>
+                    </div>
+                    <div class="container d-flex flex-column align-items-center py-5">
+                        <div class="text-start mb-3">
+                            <button id="recargarButtonGps" class="btn btn-warning">Permitir Ubicación</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+        <div id="divContenedorCamara">
+            <div class="container d-flex flex-column align-items-center py-5">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <span>Activa los permisos de la Cámara por favor</span>
+                    </div>
+                    <div class="container d-flex flex-column align-items-center py-5">
+                        <div class="text-start mb-3">
+                            <button id="recargarButtonCamara" class="btn btn-warning">Permitir Cámara</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div id="divControlAsistencia">
+            <div class="container d-flex flex-column align-items-center py-5">
+                <!-- Tarjeta principal -->
+                <div class="card">
+                    <div class="card-body text-center">
+                        <!-- Logo -->
+                        <div class="text-center mb-3">
+                            <img src="~/assets/images/logos/logo-4.png" alt="Logo" class="img-fluid logo">
+                        </div>
+
+                        <!-- Título -->
+                        <h4 class="text-center mb-3">Control de Asistencia</h4>
 
                     <!-- Video -->
                     <div class="mb-3">
                         <video id="video" autoplay></video>
                     </div>
 
-
-                    <!-- Entrada/Salida con Radiobuttons -->
-                    <div class="mb-4 text-center">
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" name="entradaSalidaOptions" id="entradaOption" value="entrada" checked>
-                            <label class="form-check-label" for="entradaOption">Entrada</label>
+                        <!-- Entrada/Salida con Radiobuttons -->
+                        <div class="mb-4 text-center">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="entradaSalidaOptions" id="entradaOption" value="entrada" checked>
+                                <label class="form-check-label" for="entradaOption">Entrada</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="entradaSalidaOptions" id="salidaOption" value="salida">
+                                <label class="form-check-label" for="salidaOption">Salida</label>
+                            </div>
                         </div>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" name="entradaSalidaOptions" id="salidaOption" value="salida">
-                            <label class="form-check-label" for="salidaOption">Salida</label>
+
+                        <div class="mb-3">
+                            <select id="Select_SearchEmpleado" data-mdb-select-init data-mdb-visible-options="5" data-mdb-filter="true" data-mdb-select-all="false" data-mdb-search-placeholder="Buscar..."
+                                    data-mdb-no-result-text="Sin resultados" data-mdb-clear-button="true">
+                            </select>
+                            <label class="form-label select-label" for="Select_SearchEmpleado" style="margin-left: 0px;">Clave Empleado</label>
                         </div>
-                    </div>
 
+                        <!-- Botón -->
+                        <button class="btn btn-success w-100">Registrar</button>
 
-
-                    <div class="mb-3">
-                        <select id="Select_SearchEmpleado" data-mdb-select-init data-mdb-visible-options="5" data-mdb-filter="true" data-mdb-select-all="false" data-mdb-search-placeholder="Buscar..."
-                                data-mdb-no-result-text="Sin resultados" data-mdb-clear-button="true">
-                        </select>
-                        <label class="form-label select-label" for="Select_SearchEmpleado" style="margin-left: 0px;">Clave Empleado</label>
-
-                    </div>
-
-
-
-                    <!-- Botón -->
-                    <button class="btn btn-success w-100">Registrar</button>
-
-                    <!-- Información de Entrada/Salida como botones -->
-                    <div class="mt-4 text-center d-flex justify-content-center gap-3">
-                        <button type="button" class="btn btn-outline-success">Entrada: 08:35 A.M.</button>
-                        <button type="button" class="btn btn-outline-danger">Salida: 16:05 P.M.</button>
+                        <!-- Información de Entrada/Salida como botones -->
+                        <div class="mt-4 text-center d-flex justify-content-center gap-3">
+                            <button type="button" class="btn btn-outline-success">Entrada: 08:35 A.M.</button>
+                            <button type="button" class="btn btn-outline-danger">Salida: 16:05 P.M.</button>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
 
     <div id="urlSeleccionarDatos" data-action-url="@Url.Action("Control_Asistencia_SeleccionarDatos", "ControlAsistencia")"></div>
 

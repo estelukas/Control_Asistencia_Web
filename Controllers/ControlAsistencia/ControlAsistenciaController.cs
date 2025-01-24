@@ -10,7 +10,7 @@ namespace XCF_Web_Control_Asistencia.Controllers.ControlAsistencia
     {
         private readonly ApiHandler _apiHandler = apiHandler ?? throw new ArgumentNullException(nameof(apiHandler));
 
-        #region Dashboard
+        #region Control Asistencia
 
         /// <summary>
         /// Pantalla de Control de Asistencia
@@ -23,10 +23,9 @@ namespace XCF_Web_Control_Asistencia.Controllers.ControlAsistencia
             return View();
         }
 
-        #endregion
 
         /// <summary>
-        /// Consultar Datos de Tabla SAT_Regimen_Fiscal
+        /// Buscar Empleado mediante su Clave, Nombre, Centro de Servicio y Mostrarlo en cierto formato
         /// </summary>
         /// <returns>Json</returns>
         [HttpPost]
@@ -43,5 +42,29 @@ namespace XCF_Web_Control_Asistencia.Controllers.ControlAsistencia
                 return BadRequest("Ocurrió un error, vuelve a intentarlo.");
             }
         }
+
+        /// <summary>
+        /// Validar si la Ubicación del Usuario esta Dentro de la Geocerca del Centro de Servicio
+        /// </summary>
+        /// <returns>Json</returns>
+        [HttpPost]
+        public IActionResult Control_Asistencia_ValidarGeocerca([FromBody] mIdUsuario model)
+        {
+            try
+            {
+                mSelect r = _apiHandler.PostAsync<mIdUsuario, mSelect>(_apiHandler.UrlControlAsistencia + "controlasistencia/Control_Asistencia_ValidarGeocerca", model).Result;
+
+                return Json(r);
+            }
+            catch (Exception)
+            {
+                return BadRequest("Ocurrió un error, vuelve a intentarlo.");
+            }
+        }
+
+        #endregion Control Asistencia
+
+
+
     }
 }
