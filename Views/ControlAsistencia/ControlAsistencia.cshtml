@@ -136,82 +136,17 @@
         </div>
 
 
-
-        <div id="divContenedorCamara">
-            <div class="container d-flex flex-column align-items-center py-5">
-                <div class="card">
-                    <div class="card-body text-center">
-                        <span>Activa los permisos de la Cámara por favor</span>
-                    </div>
-                    <div class="container d-flex flex-column align-items-center py-5">
-                        <div class="text-start mb-3">
-                            <button id="recargarButtonCamara" class="btn btn-warning">Permitir Cámara</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+    <div id="divContenedorCamaraContainer"></div>
 
 
-        <div id="divControlAsistencia">
-            <div class="container d-flex flex-column align-items-center py-5">
-                <!-- Tarjeta principal -->
-                <div class="card">
-                    <div class="card-body text-center">
-                        <!-- Logo -->
-                        <div class="text-center mb-3">
-                            <img src="~/assets/images/logos/logo-4.png" alt="Logo" class="img-fluid logo">
-                        </div>
+    <div id="controlAsistenciaContainer"></div>
 
-                        <!-- Título -->
-                        <h4 class="text-center mb-3">Control de Asistencia</h4>
-
-                    <!-- Video -->
-                    <div class="mb-3">
-                        <div class="containerVideo">
-                            <video id="video" autoplay playsinline muted style="max-width:400px;border-radius:8px;"></video>
-                            <canvas id="canvas"></canvas>
-                        </div>
-                    </div>
-
-                        <!-- Entrada/Salida con Radiobuttons -->
-                        <div class="mb-4 text-center">
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="entradaSalidaOptions" id="entradaOption" value="entrada" checked>
-                                <label class="form-check-label" for="entradaOption">Entrada</label>
-                            </div>
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="entradaSalidaOptions" id="salidaOption" value="salida">
-                                <label class="form-check-label" for="salidaOption">Salida</label>
-                            </div>
-                        </div>
-
-                        <div class="mb-3">
-                            <select id="Select_SearchEmpleado" data-mdb-select-init data-mdb-visible-options="5" data-mdb-filter="true" data-mdb-select-all="false" data-mdb-search-placeholder="Buscar..."
-                                    data-mdb-no-result-text="Sin resultados" data-mdb-clear-button="true">
-                            </select>
-                            <label class="form-label select-label" for="Select_SearchEmpleado" style="margin-left: 0px;">Clave Empleado</label>
-                        </div>
-
-
-
-                    <!-- Botón -->
-                    <button id="Registrar" class="btn btn-success w-100">Registrar</button>
-
-                        <!-- Información de Entrada/Salida como botones -->
-                        <div class="mt-4 text-center d-flex justify-content-center gap-3">
-                            <button type="button" class="btn btn-outline-success">Entrada: 08:35 A.M.</button>
-                            <button type="button" class="btn btn-outline-danger">Salida: 16:05 P.M.</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
 
     <div id="urlSeleccionarDatos" data-action-url="@Url.Action("Control_Asistencia_SeleccionarDatos", "ControlAsistencia")"></div>
-    <div id="urlGuardarFoto" data-action-url="@Url.Action("GuardarFoto", "ControlAsistencia")"></div>
+    <div id="urlGuardarFoto" data-action-url="@Url.Action("Control_Asistencia_ServidorFTP_GuardarFoto", "ControlAsistencia")"></div>
     <div id="urlValidarGeocerca" data-action-url="@Url.Action("Control_Asistencia_ValidarGeocerca", "ControlAsistencia")"></div>
-
+    <div id="urlCargarContenedorCamara" data-action-url="@Url.Action("CargarContenedorCamara", "ControlAsistencia")"></div>
+    <div id="urlCargarControlAsistencia" data-action-url="@Url.Action("CargarControlAsistencia", "ControlAsistencia")"></div>
     <!-- Script -->
     @section Scripts {
         <script src="~/js/ControlAsistencia.js" asp-append-version="true"></script>

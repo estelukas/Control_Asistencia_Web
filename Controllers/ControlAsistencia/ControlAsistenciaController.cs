@@ -138,6 +138,34 @@ namespace XCF_Web_Control_Asistencia.Controllers.ControlAsistencia
 
         #endregion Control Asistencia Validar Geocerca
 
+        #region Renderizar Control de Asistencia
+
+        /// <summary>
+        /// Cargar el Partial View del Control de Asistencia dinámicamente
+        /// </summary>
+        /// <param name="estaEnGeocerca">Estado de la geocerca</param>
+        /// <returns>Partial View</returns>
+        public IActionResult CargarControlAsistencia(bool estaEnGeocerca)
+        {
+            return PartialView("_ControlAsistenciaPartial", estaEnGeocerca);
+        }
+
+        #endregion Renderizar Control de Asistencia
+
+        #region Renderizar Contenedor Camara
+
+
+        /// <summary>
+        /// Cargar el Partial View del Contenedor de Cámara
+        /// </summary>
+        /// <returns>Partial View</returns>
+        public IActionResult CargarContenedorCamara()
+        {
+            return PartialView("_ContenedorCamaraPartial");
+        }
+
+        #endregion Renderizar Contenedor Camara
+
         #endregion Control Asistencia
 
 
