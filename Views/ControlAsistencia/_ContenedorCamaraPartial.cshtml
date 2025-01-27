@@ -1,19 +1,18 @@
 ﻿@* PartialView: _ControlAsistenciaPartial.cshtml *@
 
-<div id="divContenedorCamara">
-    <div class="container d-flex flex-column align-items-center py-5">
-        <div class="card">
-            <div class="card-body text-center">
-                <span>Activa los permisos de la Cámara por favor</span>
-            </div>
-            <div class="container d-flex flex-column align-items-center py-5">
-                <div class="text-start mb-3">
-                    <button id="recargarButtonCamara" class="btn btn-warning">Permitir Cámara</button>
-                </div>
-            </div>
+<div id="divContenedorCamara" class="container py-4">
+    <div class="card shadow-lg p-3 mb-4 bg-body rounded border border-warning mx-auto" style="max-width: 600px; width: 100%;">
+        <div class="card-body text-center py-3">
+            <p>
+                <i class="fas fa-7x fa-camera-retro text-warning"></i>
+            </p>
+            <h2 class="mb-3 text-warning">Activa los permisos de la Cámara</h2>
+            <p style="font-size: 18px;">
+                Para continuar, <strong>por favor permite el acceso a la cámara.</strong>
+            </p>
+        </div>
+        <div class="container d-flex align-items-center justify-content-center py-3">
+            <button id="recargarButtonCamara" class="btn btn-warning">Permitir Cámara</button>
         </div>
     </div>
 </div>
-
-
-

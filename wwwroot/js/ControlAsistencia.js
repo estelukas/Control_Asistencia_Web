@@ -36,20 +36,37 @@ const solicitarPermisoUbicacion = async () => {
             } else {
                 $('#divContenedorGps').show();
                 $('#divContenedorCamara').hide();
-                alert('No estás en una geocerca válida');
-            }
+                document.getElementById("divContenedorErrorGeocercaContainer").innerHTML = `
+                    <div class="container py-4">
+                        <div class="card shadow-lg p-3 mb-4 bg-body rounded border border-warning mx-auto" style="max-width: 600px; width: 100%;">
+                            <div class="card-body text-center py-3">
+                                <p>
+                                    <i class="fas fa-7x fa-map-marked-alt text-danger"></i>
+                                </p>
+                                <h2 class="mb-3 text-danger">No estás en una geocerca válida</h2>
+                                <p style="font-size: 18px;">
+                                    Para continuar, <strong>debes estar dentro de una geocerca válida.</strong>
+                                </p>
+                            </div>
+                            <div class="container d-flex align-items-center justify-content-center py-3">
+                                <button id="recargarButtonGeocerca" class="btn btn-warning">Intentar de nuevo</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                }
         } catch (error) {
             console.error("Error al obtener la ubicación:", error);
             // Mostrar el div de GPS si ocurre un error o se deniega el permiso
             if (error.code === error.PERMISSION_DENIED) {
                 $('#divContenedorGps').show();
             } else {
-                alert("Error al intentar obtener la ubicación.");
+                AlertStackingWithIcon_Mostrar("danger", 'Error al intentar obtener la ubicación.', "fa-times-circle");
                 $('#divContenedorGps').show();
             }
         }
     } else {
-        alert("Tu navegador no soporta la geolocalización.");
+        AlertStackingWithIcon_Mostrar("danger", 'Tu navegador no soporta la geolocalización.', "fa-times-circle");
         $('#divContenedorGps').show();
     }
 };
@@ -82,7 +99,7 @@ const solicitarPermisoCamara = async () => {
             $('#divContenedorCamara').show();
         }
     } else {
-        alert("Tu navegador no soporta el acceso a la cámara.");
+        AlertStackingWithIcon_Mostrar("danger", 'Tu navegador no soporta el acceso a la cámara.', "fa-times-circle");
         $('#divContenedorCamara').show();
     }
 };
@@ -428,6 +445,7 @@ function fillMDBSelect(id, optionsArray) {
 
 //#region tomar foto y guardar en ftp
 const capturarImagen = async () => {
+    startLoadingButton("#Registrar")
     const context = canvas.getContext("2d");
     const videoElement = document.getElementById('video');
     const fecha = new Date();
@@ -467,15 +485,17 @@ const capturarImagen = async () => {
 
     // Mostrar el resultado
     if (!seleccionado) {
-        alert ('Debes seleccionar el tipo: Entrada o Salida')
+        AlertStackingWithIcon_Mostrar("warning", 'Debes seleccionar el tipo: Entrada o Salida.', "fa-times-circle");
+        quitLoadingButton("#Registrar")
         return 0;
     }
 
 
 
     
-    if (rfc == 'null.png') {
-        alert('debes ecribir tu clave de empleado')
+    if (rfc == null) {
+        AlertStackingWithIcon_Mostrar("warning", 'Debes ecribir tu clave de empleado', "fa-times-circle");
+        quitLoadingButton("#Registrar")
         return false;
     }
    
@@ -497,14 +517,22 @@ const capturarImagen = async () => {
         });
         if (response.ok) {
             const result = await response.json();
-            console.log(result.contenido);
-            alert(result.contenido); // Ruta devuelta por el servidor
+            if (result.id) {
+                AlertStackingWithIcon_Mostrar("success", result.contenido, "fa-times-circle");
+                quitLoadingButton("#Registrar")
+
+            } else {
+                AlertStackingWithIcon_Mostrar("warning", result.contenido, "fa-times-circle");
+                quitLoadingButton("#Registrar")
+
+            }
         } else {
             throw new Error('Error al guardar la imagen.');
         }
     } catch (error) {
         console.error('Error:', error);
-        alert('No se pudo guardar la imagen.');
+        AlertStackingWithIcon_Mostrar("danger", 'No se pudo guardar la imagen.', "fa-times-circle");
+        quitLoadingButton("#Registrar")
     }
 };
 //#endregion tomar foto y guardar en ftp//#endregion tomar foto y guardar en ftp
@@ -564,4 +592,87 @@ const seleccionarEntradaSalidaPorDefecto = () => {
 };
 
 
-//#endregion Seleccionar Entrada Salida Por Defecto 
+//#endregion Seleccionar Entrada Salida Por Defecto
+
+//#region AlertStackingWithIcon_Mostrar
+
+function AlertStackingWithIcon_Mostrar(Color, Texto, Icono) {
+    const alert = document.createElement('div');
+    alert.innerHTML = `
+        <i class="fas ${Icono} me-3"></i>${Texto}
+        <button type="button" class="btn-close" data-mdb-dismiss="alert" aria-label="Close"></button>
+    `;
+    alert.classList.add('alert', 'fade', 'alert-dismissible');
+    document.body.appendChild(alert);
+    const alertInstance = new mdb.Alert(alert, {
+        color: Color,
+        stacking: true,
+        hidden: true,
+        //width: '450px',
+        width: '400px',
+        position: 'top-center',
+        autohide: true,
+        delay: 5000,
+    });
+    alertInstance.show();
+
+    //Sirve para eliminarlo del html una vez termine de aparecer la notificación
+    setTimeout(() => {
+        alertInstance.close();
+    }, 5000);
+}
+
+//#endregion AlertStackingWithIcon_Mostrar
+
+//#region startLoadingButton
+
+function startLoadingButton(id) {
+    // Verificar si el botón ya está en estado de carga
+    $('.custom-tooltip').remove();
+    $(id).trigger('mouseleave');
+
+    if ($(id).data('loading')) {
+        return; // Si ya está en estado de carga, no hacer nada
+    }
+
+    // Guardar el estado original del botón en un atributo de datos
+    $(id).data('original-text', $(id).html());
+
+    // Deshabilitar todos los botones y guardar su estado
+    $('button').each(function () {
+        var button = $(this);
+        if (!button.prop('disabled')) {
+            button.data('previously-enabled', true);
+        }
+        button.prop('disabled', true);
+    });
+
+    // Cambiar el contenido del botón que inició la carga
+    $(id).html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>');
+
+    // Marcar el botón como en estado de carga
+    $(id).data('loading', true);
+}
+
+function quitLoadingButton(id) {
+    // Restaurar el estado original del botón
+    $('.custom-tooltip').remove();
+    var originalText = $(id).data('original-text');
+    $(id).html(originalText);
+    $(id).prop("disabled", false);
+
+    // Limpiar el atributo de datos que contenía el estado original
+    $(id).removeData('original-text');
+    $(id).removeData('loading');
+
+    // Restaurar el estado de los botones que fueron deshabilitados previamente
+    $('button').each(function () {
+        var button = $(this);
+        if (button.data('previously-enabled')) {
+            button.prop('disabled', false);
+            button.removeData('previously-enabled');
+        }
+    });
+}
+
+//#endregion startLoadingButton
