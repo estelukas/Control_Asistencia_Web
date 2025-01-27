@@ -434,6 +434,7 @@ const capturarImagen = async () => {
 
     // Obtén el mes (agregar un 0 si es menor a 10)
     const month = String(fecha.getMonth() + 1).padStart(2, '0');
+    const day = String(fecha.getDate()).padStart(2, '0');
 
     // Obtén la hora con segundos (agregar un 0 si es menor a 10)
     const hours = String(fecha.getHours()).padStart(2, '0');
@@ -441,7 +442,7 @@ const capturarImagen = async () => {
     const seconds = String(fecha.getSeconds()).padStart(2, '0');
     const nombre = `${hours}${minutes}${seconds}.png`;
     // Combina todo en el formato deseado
-    const resultado = `/${year}/${month}/`;
+    const resultado = `/${year}/${month}/${day}/`;
     // Si hay un flip horizontal, aplicarlo al canvas
     
         context.save();
