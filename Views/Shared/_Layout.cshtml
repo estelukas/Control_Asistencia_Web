@@ -4,11 +4,13 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] Control Asistencia</title>
-    <!-- Evitar traducción automática -->
     <meta name="google" content="notranslate">
 
     <!-- Inclusión de la librería jQuery -->
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
+
+    <!-- Enlace a la hoja de estilos de Font Awesome para iconos -->
+    <link rel="stylesheet" href="~/lib/font-awesome/fontawesome-free-6.4.2-web/css/all.min.css" />
 
     <!-- MDB ESSENTIAL -->
     <link rel="stylesheet" href="~/lib/mdbpro/css/mdb.min.css" />
@@ -20,27 +22,22 @@
     <!-- Configuración básica de la página -->
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-
 </head>
 <body>
     <div class="container">
         <main role="main" class="pb-3">
-            @RenderBody()
+            @RenderBody() <!-- Aquí se renderizará el contenido de las vistas -->
         </main>
     </div>
+
+    <!-- Inclusión de scripts necesarios -->
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/lib/mdbpro/js/mdb.umd.min.js?v=3"></script> <!-- Asegúrate de que esta línea cargue el JS de MDB -->
+    <script src="~/lib/mdbpro/plugins/js/all.min.js"></script> <!-- Scripts de plugins si es necesario -->
     <!-- Inclusión de scripts de validación jQuery -->
     <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
     <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
-
-    <!-- MDB ESSENTIAL -->
-    <script src="~/lib/mdbpro/js/mdb.umd.min.js?v=3"></script>
-
-    <!-- MDB PLUGINS -->
-    <script src="~/lib/mdbpro/plugins/js/all.min.js"></script>
-
 
     @await RenderSectionAsync("Scripts", required: false)
 </body>
