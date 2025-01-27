@@ -1,0 +1,63 @@
+﻿@* PartialView: _ControlAsistenciaPartial.cshtml *@
+@model bool
+
+@if (Model) // Si está en la geocerca
+{
+    <div id="divControlAsistencia">
+        <div id="divControlAsistencia">
+            <div class="container d-flex flex-column align-items-center py-5">
+                <!-- Tarjeta principal -->
+                <div class="card">
+                    <div class="card-body text-center">
+                        <!-- Logo -->
+                        <div class="text-center mb-3">
+                            <img src="~/assets/images/logos/logo-4.png" alt="Logo" class="img-fluid logo">
+                        </div>
+
+                        <!-- Título -->
+                        <h4 class="text-center mb-3">Control de Asistencia</h4>
+
+                        <!-- Video -->
+                        <div class="mb-3">
+                            <div class="containerVideo">
+                                <video id="video" autoplay playsinline muted style="max-width:400px;border-radius:8px;"></video>
+                                <canvas id="canvas"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- Entrada/Salida con Radiobuttons -->
+                        <div class="mb-4 text-center">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="entradaSalidaOptions" id="entradaOption" value="entrada">
+                                <label class="form-check-label" for="entradaOption">Entrada</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="entradaSalidaOptions" id="salidaOption" value="salida">
+                                <label class="form-check-label" for="salidaOption">Salida</label>
+                            </div>
+                        </div>
+
+                        <!-- Selector de empleado -->
+                        <div class="mb-3">
+                            <select id="Select_SearchEmpleado" data-mdb-select-init data-mdb-visible-options="5" data-mdb-filter="true" data-mdb-search-placeholder="Buscar..."
+                                    data-mdb-no-result-text="Sin resultados" data-mdb-clear-button="true">
+                            </select>
+                            <label class="form-label select-label" for="Select_SearchEmpleado" style="margin-left: 0px;">Clave Empleado</label>
+                        </div>
+
+                        <!-- Botón -->
+                        <button id="Registrar" class="btn btn-success w-100">Registrar</button>
+
+                        <!-- Información de Entrada/Salida -->
+                        <div class="mt-4 text-center d-flex justify-content-center gap-3">
+                            <span class="badge badge-success p-3">Entrada: 08:35 A.M.</span>
+                            <span class="badge badge-danger p-3">Salida: 16:05 P.M.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+
