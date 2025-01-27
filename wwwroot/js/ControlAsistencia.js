@@ -2,6 +2,7 @@
 let jsonResponse = [];
 let EstaEnGeocerca=0;
 let IdCentroServicio = 0;
+let CentroServicio = '';
 let htmlContent;
 $(document).ready(() => {
     $('#divContenedorCamara').hide();
@@ -156,7 +157,8 @@ const ConsultarGeocerca = async (latitud, longuitud) => {
                 jsonResponse = json.ValidarCobertura;
                 if (jsonResponse.length > 0) {
                     EstaEnGeocerca = 1;
-                    IdCentroServicio = jsonResponse[0].id;
+                    IdCentroServicio = jsonResponse[0].Id;
+                    CentroServicio = jsonResponse[0].Nombre;
                 } else {
                     EstaEnGeocerca = 0;
                     IdCentroServicio = null;
@@ -454,9 +456,22 @@ const capturarImagen = async () => {
     const imageData = canvas.toDataURL("image/png");
 
     let rfc = $('#Select_SearchEmpleado').val();
-
+    let ClaveEmpleado = $('#Select_SearchEmpleado option:selected').text();
+    ClaveEmpleado = ClaveEmpleado.split(" ")[0];
     const ruta = rfc + resultado;
     //rfc = rfc + '.png';
+
+    // Obtener el valor del radio seleccionado
+    let seleccionado = $('input[name="entradaSalidaOptions"]:checked').val();
+
+    // Mostrar el resultado
+    if (!seleccionado) {
+        alert ('Debes seleccionar el tipo: Entrada o Salida')
+        return 0;
+    }
+
+
+
     
     if (rfc == 'null.png') {
         alert('debes ecribir tu clave de empleado')
@@ -474,7 +489,9 @@ const capturarImagen = async () => {
                 Base64: imageData, // Enviamos la imagen en base64
                 Nombre: nombre, // Puedes incluir el nombre del archivo
                 Ruta: ruta,
-                Rfc: rfc
+                Rfc: rfc,
+                ClaveEmpleado: ClaveEmpleado,
+                TipoAsistencia: seleccionado
             })
         });
         if (response.ok) {

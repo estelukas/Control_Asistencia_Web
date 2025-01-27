@@ -82,7 +82,7 @@ namespace XCF_Web_Control_Asistencia.Controllers.ControlAsistencia
         {
             try
             {
-                List<mImagenRequest> l = _apiHandler.PostAsync<mImagenRequest, List<mImagenRequest>>(_apiHandler.UrlControlAsistencia + "controlasistencia/Control_Asistencia_ServidorFTP_GuardarFoto", model).Result;
+                mSelect l = _apiHandler.PostAsync<mImagenRequest, mSelect>(_apiHandler.UrlControlAsistencia + "controlasistencia/Control_Asistencia_ServidorFTP_GuardarFoto", model).Result;
 
 
                 return Json(l);
