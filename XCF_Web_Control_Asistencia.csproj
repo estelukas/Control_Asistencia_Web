@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Folder Include="Views\PartialViews\" />
     <Folder Include="wwwroot\css\" />
   </ItemGroup>
 

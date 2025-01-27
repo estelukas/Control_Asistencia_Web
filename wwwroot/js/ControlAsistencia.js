@@ -2,6 +2,7 @@
 let jsonResponse = [];
 let EstaEnGeocerca=0;
 let IdCentroServicio = 0;
+let CentroServicio = '';
 let htmlContent;
 $(document).ready(() => {
     $('#divContenedorCamara').hide();
@@ -230,6 +231,7 @@ const cargarControlAsistencia = async (estaEnGeocerca) => {
             // Renderiza el contenido parcial pero no lo muestra aún
             $("#controlAsistenciaContainer").html(htmlContent);
             $('#controlAsistenciaContainer').show();
+            $("#centroServicio").text(jsonResponse[0].Nombre)
         } else {
             throw new Error(`Error al cargar el control de asistencia: ${response.statusText}`);
         }

@@ -1,5 +1,12 @@
 using Newtonsoft.Json;
 using XCF_Web_Control_Asistencia.Classes;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Mvc.ViewEngines;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
+using System.IO;
+using Microsoft.AspNetCore.Mvc.Abstractions;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.AspNetCore.Mvc;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -35,6 +42,29 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
 app.UseAuthorization();
+app.UseSession();
+
+// Middleware para la verificación de navegador
+app.Use(async (context, next) =>
+{
+    var userAgent = context.Request.Headers["User-Agent"].ToString();
+
+    // Verificar si no es Chrome o si es Edge (que también contiene 'Chrome' en el User-Agent)
+    if (!userAgent.Contains("Chrome") || userAgent.Contains("Edg"))
+    {
+        // Renderizar el Partial View si no es Chrome
+        context.Response.StatusCode = 200;
+        context.Response.ContentType = "text/html";
+        var partialViewContent = await ViewRenderHelper.RenderPartialViewToString(context, "_UnsupportedBrowser");
+        await context.Response.WriteAsync(partialViewContent);
+    }
+    else
+    {
+        // Continuar con el pipeline normal si es Chrome
+        await next();
+    }
+});
+// Verifica si el navegador es Chrome
 app.UseSession();
 
 // Configurar rutas
