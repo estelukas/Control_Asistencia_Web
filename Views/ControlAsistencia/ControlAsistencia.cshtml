@@ -1,56 +1,156 @@
 ﻿@{
     Layout = "_Layout";
 }
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registro de Entrada/Salida</title>
-    <!-- MDBootstrap CSS -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.0.0/mdb.min.css" rel="stylesheet">
-</head>
+
+<style>
+    body {
+        background-color: #f8f9fa; /* Fondo claro para una experiencia limpia */
+        font-family: Arial, sans-serif;
+    }
+
+    .logo {
+        max-width: 300px; /* Tamaño máximo para pantallas grandes */
+        width: 100%; /* Asegura que la imagen se ajuste al 100% del contenedor */
+        height: auto;
+    }
+
+    .card {
+        width: 100%;
+        max-width: 45rem; /* Aumentamos el tamaño máximo de la tarjeta */
+        padding: 2rem;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        background-color: #fff;
+    }
+
+ /*    video {
+        width: 100%;
+        height: auto;
+        border-radius: 8px;
+    } */
+    .containerVideo {
+        position: relative;
+        display: inline-block;
+    }
+
+    video, canvas {
+        display: block;
+        width: 100%;
+        height: auto;
+        transform: scaleX(-1);
+    }
+
+    canvas {
+        position: absolute;
+        top: 0;
+        left: 0;
+    }
+
+
+    .progress {
+        height: 25px;
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+    .progress-bar {
+        font-size: 0.9rem;
+        line-height: 25px;
+    }
+
+    .form-check-label {
+        font-size: 1.2rem;
+    }
+
+    .form-select {
+        font-size: 1.1rem;
+        padding: 0.6rem;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+    }
+
+    button {
+        font-size: 1.2rem;
+        padding: 0.75rem;
+        border-radius: 8px;
+    }
+
+    .info-text p {
+        font-size: 1.1rem;
+        margin: 0.5rem 0;
+    }
+
+    .container {
+        max-width: 1000px; /* Aumentar el ancho máximo del contenedor */
+    }
+
+    /* Personaliza los estilos de la descripción secundaria */
+    .selectpicker option[data-content] {
+        display: block;
+    }
+
+    .selectpicker .bs-searchbox input {
+        padding-left: 2em;
+    }
+
+    .text-muted {
+        font-size: 0.9rem;
+    }
+
+    .select-option {
+        /*Quitar la altura fija a la plantilla de mdb.*/
+        height: unset !important;
+        min-height: 38px;
+        white-space: normal !important;
+        text-overflow: unset !important;
+        overflow: unset !important;
+    }
+
+    .select-option-text {
+        padding-top: 3px !important;
+    }
+
+    .select-option-secondary-text {
+        padding-bottom: 6px !important;
+/*         color: #3b71ca90 !important;
+ */    }
+
+</style>
+
 <body class="bg-light">
-    <div class="container d-flex flex-column align-items-center py-5">
-        <div class="text-center">
-            <img src="~/assets/images/logos/logo-4.png" alt="Logo" style="max-width: 150px;">
-        </div>
-        <div class="card mt-4" style="width: 22rem;">
-            <div class="card-body text-center">
-                <div class="mb-3">
-                    <img src="~/assets/images/logos/pngegg.png" alt="Foto de perfil" class="img-fluid rounded-circle" style="width: 150px; height: 150px;">
+
+        <div id="divContenedorGps">
+            <div class="container d-flex flex-column align-items-center py-5">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <span>Activa los permisos de la Ubicación por favor</span>
+                    </div>
+                    <div class="container d-flex flex-column align-items-center py-5">
+                        <div class="text-start mb-3">
+                            <button id="recargarButtonGps" class="btn btn-warning">Permitir Ubicación</button>
+                        </div>
+                    </div>
                 </div>
-                <div class="progress mb-3">
-                    <div class="progress-bar" role="progressbar" style="width: 50%;" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
-                </div>
-                <div class="form-check form-switch d-flex justify-content-center mb-4">
-                    <input class="form-check-input" type="checkbox" id="entradaSalidaSwitch">
-                    <label class="form-check-label ms-2" for="entradaSalidaSwitch">Entrada/Salida</label>
-                </div>
-                <div class="mb-4">
-                    <select class="form-select" aria-label="Seleccione empleado">
-                        <option selected>Kevin</option>
-                        <!-- Agregar más opciones según sea necesario -->
-                    </select>
-                </div>
-                <button class="btn btn-success">Registrar</button>
             </div>
         </div>
-        <div class="mt-4 text-center">
-            <p>Entrada: 08:35 A.M.</p>
-            <p>Salida: 16:05 P.M.</p>
-        </div>
-    </div>
-    <!-- MDBootstrap JS -->
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.0.0/mdb.min.js"></script>
+
+
+    <div id="divContenedorCamaraContainer"></div>
+
+
+    <div id="controlAsistenciaContainer"></div>
+
+
+    <div id="urlSeleccionarDatos" data-action-url="@Url.Action("Control_Asistencia_SeleccionarDatos", "ControlAsistencia")"></div>
+    <div id="urlGuardarFoto" data-action-url="@Url.Action("Control_Asistencia_ServidorFTP_GuardarFoto", "ControlAsistencia")"></div>
+    <div id="urlValidarGeocerca" data-action-url="@Url.Action("Control_Asistencia_ValidarGeocerca", "ControlAsistencia")"></div>
+    <div id="urlCargarContenedorCamara" data-action-url="@Url.Action("CargarContenedorCamara", "ControlAsistencia")"></div>
+    <div id="urlCargarControlAsistencia" data-action-url="@Url.Action("CargarControlAsistencia", "ControlAsistencia")"></div>
+    <!-- Script -->
+    @section Scripts {
+        <script src="~/js/ControlAsistencia.js" asp-append-version="true"></script>
+
+    }
 </body>
-</html>
 
-
-<div id="urlSeleccionarDatos" data-action-url="@Url.Action("Control_Asistencia_SeleccionarDatos", "ControlAsistencia")"></div>
-
-<!-- Script -->
-@section Scripts {
-
-    <script src="~/js/ControlAsistencia.js" asp-append-version="true"></script>
-}
