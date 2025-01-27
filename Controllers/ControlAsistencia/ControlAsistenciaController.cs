@@ -49,27 +49,6 @@ namespace XCF_Web_Control_Asistencia.Controllers.ControlAsistencia
 
         #endregion Control Asistencia Seleccionar Datos
 
-        #region comparacionFotos
-        /// <summary>
-        /// Consultar si los dos rostros se parecen
-        /// </summary>
-        /// <returns>Json</returns>
-        [HttpPost]
-        public IActionResult CompararRostro([FromBody] mIdUsuario model)
-        {
-            try
-            {
-                mSelect r = _apiHandler.PostAsync<mIdUsuario, mSelect>(_apiHandler.UrlControlAsistencia + "controlasistencia/CompararRostro", model).Result;
-
-                return Json(r);
-            }
-            catch (Exception)
-            {
-                return BadRequest("Ocurrió un error, vuelve a intentarlo.");
-            }
-        }
-        #endregion compracionFotos
-
         #region Control Asistencia Guardar Información Asistencia
 
         /// <summary>

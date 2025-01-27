@@ -6,7 +6,7 @@ let htmlContent;
 $(document).ready(() => {
     $('#divContenedorCamara').hide();
     $('#divControlAsistencia').hide();
-
+    
     // Inicia el flujo solicitando permisos de ubicación
     solicitarPermisoUbicacion();
 });
@@ -427,6 +427,22 @@ function fillMDBSelect(id, optionsArray) {
 const capturarImagen = async () => {
     const context = canvas.getContext("2d");
     const videoElement = document.getElementById('video');
+    const fecha = new Date();
+
+    // Obtén el año
+    const year = fecha.getFullYear();
+
+    // Obtén el mes (agregar un 0 si es menor a 10)
+    const month = String(fecha.getMonth() + 1).padStart(2, '0');
+    const day = String(fecha.getDate()).padStart(2, '0');
+
+    // Obtén la hora con segundos (agregar un 0 si es menor a 10)
+    const hours = String(fecha.getHours()).padStart(2, '0');
+    const minutes = String(fecha.getMinutes()).padStart(2, '0');
+    const seconds = String(fecha.getSeconds()).padStart(2, '0');
+    const nombre = `${hours}${minutes}${seconds}.png`;
+    // Combina todo en el formato deseado
+    const resultado = `/${year}/${month}/${day}/`;
     // Si hay un flip horizontal, aplicarlo al canvas
     
         context.save();
@@ -438,9 +454,9 @@ const capturarImagen = async () => {
     const imageData = canvas.toDataURL("image/png");
 
     let rfc = $('#Select_SearchEmpleado').val();
-    
-    const ruta = 'Empleados/' + rfc + '/Fotos/';
-    rfc = rfc + '.png';
+
+    const ruta = rfc + resultado;
+    //rfc = rfc + '.png';
     
     if (rfc == 'null.png') {
         alert('debes ecribir tu clave de empleado')
@@ -456,8 +472,9 @@ const capturarImagen = async () => {
             },
             body: JSON.stringify({
                 Base64: imageData, // Enviamos la imagen en base64
-                Nombre: rfc, // Puedes incluir el nombre del archivo
-                Ruta: ruta
+                Nombre: nombre, // Puedes incluir el nombre del archivo
+                Ruta: ruta,
+                Rfc: rfc
             })
         });
         if (response.ok) {
