@@ -333,11 +333,10 @@ const cargarContenedorCamara = async () => {
 
 const EmpleadoConsultarDatosSelectData = async (searchTerm = "") => {
     try {
-        // Si searchTerm está vacío, limpiamos las opciones del select
         if (!searchTerm.trim()) {
-            $('#Select_SearchEmpleado').empty(); // Limpia todas las opciones del select
-            $('#Select_SearchEmpleado').prop('disabled', false); // Habilita el select
-            $('#select-dropdown-container-Select_SearchEmpleado .select-no-results').hide(); // Oculta "Sin resultados"
+            $('#Select_SearchEmpleado').empty();
+            $('#Select_SearchEmpleado').prop('disabled', false);
+            $('#select-dropdown-container-Select_SearchEmpleado .select-no-results').hide();
             return;
         }
 
@@ -347,40 +346,45 @@ const EmpleadoConsultarDatosSelectData = async (searchTerm = "") => {
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({
-                ParametroBusqueda: searchTerm // Pasar el término de búsqueda
+                ParametroBusqueda: searchTerm,
+                CentroServicio: jsonResponse[0].Nombre
             })
         });
 
         if (response.ok) {
-            // Obtener el JSON de la respuesta
             let jsonObject = await response.json();
 
-            // Verifica si el JSON tiene datos de empleados
             if (jsonObject.id === 1 && jsonObject.contenido) {
-                // Parsear el contenido que es una cadena JSON
                 const empleados = JSON.parse(jsonObject.contenido).EmpleadoConsulta;
 
-                // Crear un array para las opciones del select con la lógica solicitada
                 const optionsArray = empleados.map(empleado => {
-                    // Separar el texto principal y el texto secundario
                     let [mainText, secondaryText] = empleado.Nombre_Empleado.split('Centro de Servicio:');
-                    mainText = mainText.trim(); // Nombre del empleado
-                    secondaryText = secondaryText ? 'Centro de Servicio: ' + secondaryText.trim() : ''; // Centro de Servicio
-                    valor = empleado.RFC;
-                    return [valor, empleado.Nombre_Empleado, mainText, secondaryText];
+                    mainText = mainText.trim();
+                    secondaryText = secondaryText ? 'Centro de Servicio: ' + secondaryText.trim() : '';
+                    return [empleado.RFC, empleado.Nombre_Empleado, mainText, secondaryText, empleado.Hora_Entrada, empleado.Hora_Salida];
                 });
 
-                // Llamar a la función para llenar el select
                 fillMDBSelect('#Select_SearchEmpleado', optionsArray);
 
-                // Asegurarse de que el select esté habilitado
                 $('#Select_SearchEmpleado').prop('disabled', false);
-                $('#select-dropdown-container-Select_SearchEmpleado .select-no-results').hide(); // Ocultar "Sin resultados" si hay datos
+                $('#select-dropdown-container-Select_SearchEmpleado .select-no-results').hide();
+
+                // Evento para detectar cambios en el select y actualizar las horas de entrada/salida
+                $('#Select_SearchEmpleado').off('change').on('change', function () {
+                    const selectedRFC = $(this).val();
+                    const empleadoSeleccionado = empleados.find(emp => emp.RFC === selectedRFC);
+
+                    if (empleadoSeleccionado) {
+                        $("#horaEntrada").text(`Entrada: ${empleadoSeleccionado.Hora_Entrada !== "No registra" ? formatHora(empleadoSeleccionado.Hora_Entrada) : ""}`);
+                        $("#horaSalida").text(`Salida: ${empleadoSeleccionado.Hora_Salida !== "No registra" ? formatHora(empleadoSeleccionado.Hora_Salida) : ""}`);
+                    }
+                });
+
             } else {
                 console.error("Error en los datos del servidor");
-                $('#Select_SearchEmpleado').empty(); // Limpia el select si no hay datos
-                $('#select-dropdown-container-Select_SearchEmpleado .select-no-results').show(); // Mostrar "Sin resultados"
-                $('#Select_SearchEmpleado').prop('disabled', false); // Asegurarse de que el select esté habilitado
+                $('#Select_SearchEmpleado').empty();
+                $('#select-dropdown-container-Select_SearchEmpleado .select-no-results').show();
+                $('#Select_SearchEmpleado').prop('disabled', false);
             }
         } else {
             const errorMessage = await response.text();
@@ -389,6 +393,13 @@ const EmpleadoConsultarDatosSelectData = async (searchTerm = "") => {
     } catch (error) {
         console.error("Error: ", error);
     }
+};
+
+// Función para formatear la hora en formato AM/PM
+const formatHora = (hora) => {
+    if (!hora) return "No registra";
+    const date = new Date(hora);
+    return date.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit', hour12: true });
 };
 
 //#endregion
