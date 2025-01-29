@@ -52,7 +52,7 @@ const solicitarPermisoUbicacion = async () => {
                 $('#divContenedorGps').hide();
                 $('#divContenedorCamara').show();
                 // Evitar recargar en un ciclo
-                solicitarPermisoCamara();
+                await solicitarPermisoCamara();
             } else {
                 $('#divContenedorGps').hide().css({ 'display': 'none', 'visibility': 'hidden', });
                 document.getElementById("divContenedorErrorGeocercaContainer").innerHTML = `
@@ -92,7 +92,7 @@ const solicitarPermisoUbicacion = async () => {
 
 
 const solicitarPermisoCamara = async () => {
-    cargarContenedorCamara();
+    await cargarContenedorCamara();
 
     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
         try {
@@ -104,13 +104,20 @@ const solicitarPermisoCamara = async () => {
 
             // Ocultar el div de permisos de cámara
             $('#divContenedorCamara').hide();
+            // Asegúrate de que se oculte completamente
+            $("#divContenedorCamaraContainer").hide().css({
+                display: "none",
+                visibility: "hidden",
+                opacity: "0",
+            });
+
             $('#divContenedorGps').hide();
 
             // Cargar control de asistencia
             await cargarControlAsistencia(true);
 
             // Inicializar la cámara una vez que el contenido parcial está cargado
-            inicializarCamara();
+            await inicializarCamara();
         } catch (error) {
             console.error("Error al acceder a la cámara:", error);
 
@@ -576,6 +583,7 @@ const capturarImagen = async () => {
         });
         if (response.ok) {
             const result = await response.json();
+            console.log(result);
             if (result.id) {
                 AlertStackingWithIcon_Mostrar("success", result.contenido, "fa-times-circle");
                 quitLoadingButton("#Registrar")
