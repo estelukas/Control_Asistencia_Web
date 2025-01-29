@@ -557,7 +557,6 @@ const capturarImagen = async () => {
         quitLoadingButton("#Registrar")
         return false;
     }
-
     // Enviar la imagen al servidor
     try {
         const response = await fetch($("#urlGuardarFoto").data("action-url"), {
@@ -571,7 +570,8 @@ const capturarImagen = async () => {
                 Ruta: ruta,
                 Rfc: rfc,
                 ClaveEmpleado: ClaveEmpleado,
-                TipoAsistencia: seleccionado
+                TipoAsistencia: seleccionado,
+                IdGeocerca: IdCentroServicio.toString()
             })
         });
         if (response.ok) {
