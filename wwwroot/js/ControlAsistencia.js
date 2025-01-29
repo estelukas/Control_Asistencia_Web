@@ -1,13 +1,33 @@
-﻿//#region Carga Inicial
+﻿//#region Variables Mobiles
+let android = window.Android;
+
+const isMobile = () => {
+    return Boolean(android)
+}
+
+//#endregion Variables Mobiles
+
+//#region Variables Globales
+
+let isFlipped = false;
+const tempCanvas = document.createElement("canvas");
+const tempContext = tempCanvas.getContext("2d");
+
+//#endregion Variables Globales
+
+//#region Carga Inicial
 let jsonResponse = [];
-let EstaEnGeocerca=0;
+let EstaEnGeocerca = 0;
 let IdCentroServicio = 0;
 let CentroServicio = '';
 let htmlContent;
 $(document).ready(() => {
+    if (!isMobile()) {
+        verificarPermisos();
+    }
     $('#divContenedorCamara').hide();
     $('#divControlAsistencia').hide();
-    
+
     // Inicia el flujo solicitando permisos de ubicación
     solicitarPermisoUbicacion();
 });
@@ -34,8 +54,7 @@ const solicitarPermisoUbicacion = async () => {
                 // Evitar recargar en un ciclo
                 solicitarPermisoCamara();
             } else {
-                $('#divContenedorGps').show();
-                $('#divContenedorCamara').hide();
+                $('#divContenedorGps').hide().css({ 'display': 'none', 'visibility': 'hidden', });
                 document.getElementById("divContenedorErrorGeocercaContainer").innerHTML = `
                     <div class="container py-4">
                         <div class="card shadow-lg p-3 mb-4 bg-body rounded border border-warning mx-auto" style="max-width: 600px; width: 100%;">
@@ -54,7 +73,7 @@ const solicitarPermisoUbicacion = async () => {
                         </div>
                     </div>
                 `;
-                }
+            }
         } catch (error) {
             console.error("Error al obtener la ubicación:", error);
             // Mostrar el div de GPS si ocurre un error o se deniega el permiso
@@ -129,7 +148,8 @@ const inicializarCamara = async () => {
 
         // Detectar si es necesario aplicar un flip horizontal
         const settings = stream.getVideoTracks()[0].getSettings();
-        if (settings.facingMode === "user") {
+        isFlipped = settings.facingMode === "user";
+        if (isFlipped) {
             videoElement.style.transform = "scaleX(-1)";
         } else {
             videoElement.style.transform = "none";
@@ -202,34 +222,47 @@ $('#recargarButtonCamara').on('click', () => {
     location.reload();
 });
 
+$(document).on('click', '#recargarButtonGeocerca', async  () => {
+    location.reload();
+});
+
 //#endregion
 
 //#region Verificación de permisos dinámicos
 
 // Verifica los permisos de ubicación y cámara y ajusta la interfaz dinámicamente
 const verificarPermisos = () => {
-    // Verificar permisos de ubicación
-    navigator.permissions.query({ name: "geolocation" }).then((result) => {
-        if (result.state !== "granted") {
+
+    navigator.permissions.query({ name: 'geolocation' }).then(function (permissionStatus) {
+        if (permissionStatus.state !== "granted") {
             // Si los permisos de ubicación no están otorgados, mostrar el div de permiso de GPS
             $('#divControlAsistencia').hide();
-            $('#divRestablecerPermisos').hide();
             $('#divContenedorGps').show();
-        } else {
-            // Si GPS está otorgado, verificar permisos de cámara
-            navigator.permissions.query({ name: "camera" }).then((result) => {
-                if (result.state !== "granted") {
-                    // Si los permisos de cámara no están otorgados, mostrar el div de restablecer permisos
-                    $('#divControlAsistencia').hide();
-                    $('#divRestablecerPermisos').show();
-                }
-            });
         }
+        permissionStatus.onchange = function () {
+            if (permissionStatus.state !== "granted") {
+                // Si los permisos de ubicación no están otorgados, mostrar el div de permiso de GPS
+                $('#divControlAsistencia').hide();
+                $('#divContenedorGps').show();
+            }
+        };
+    });
+    navigator.permissions.query({ name: 'camera' }).then(function (permissionStatus) {
+        if (permissionStatus.state !== "granted") {
+            // Si los permisos de cámara no están otorgados, mostrar el div de restablecer permisos
+            $('#divControlAsistencia').hide();
+            $('#divContenedorCamara').show();
+        }
+        permissionStatus.onchange = function () {
+            if (permissionStatus.state !== "granted") {
+                // Si los permisos de cámara no están otorgados, mostrar el div de restablecer permisos
+                $('#divControlAsistencia').hide();
+                $('#divContenedorCamara').show();
+
+            }
+        };
     });
 }
-
-// Llamar a verificar permisos periódicamente
-setInterval(verificarPermisos, 3000); // Verificar cada 3 segundos
 
 //#endregion
 
@@ -426,15 +459,15 @@ function fillMDBSelect(id, optionsArray) {
 
         // Agregar las opciones dinámicamente
         optionsArray.forEach(([value, mainText, secondaryText]) => {
-       
+
             const option = $("<option>", {
                 value: value,
                 text: secondaryText,
                 'data-mdb-secondary-text': 'Centro de Servicio ' + mainText.split('Centro de Servicio')[1]
-        });
-                
+            });
+
             selectElement.append(option);
-    });
+        });
 
         selectElement.prop("disabled", false);
     }
@@ -444,9 +477,9 @@ function fillMDBSelect(id, optionsArray) {
 //#endregion fillMDBSelect
 
 //#region tomar foto y guardar en ftp
+
 const capturarImagen = async () => {
     startLoadingButton("#Registrar")
-    const context = canvas.getContext("2d");
     const videoElement = document.getElementById('video');
     const fecha = new Date();
 
@@ -464,15 +497,30 @@ const capturarImagen = async () => {
     const nombre = `${hours}${minutes}${seconds}.png`;
     // Combina todo en el formato deseado
     const resultado = `/${year}/${month}/${day}/`;
-    // Si hay un flip horizontal, aplicarlo al canvas
-    
-        context.save();
-        context.scale(-1, 1); // Voltear el canvas horizontalmente
-        context.drawImage(videoElement, -canvas.width, 0, canvas.width, canvas.height);
-        context.restore();
-    
+
+    // Configurar el tamaño del canvas temporal
+    tempCanvas.width = videoElement.videoWidth;
+    tempCanvas.height = videoElement.videoHeight;
+
+    // Verificar si el video tiene el transform CSS
+    const computedStyle = window.getComputedStyle(videoElement);
+    const transformMatrix = computedStyle.transform;
+
+    tempContext.save();
+
+    if (transformMatrix.includes("matrix(-1")) {
+        // Aplicar un volteo horizontal
+        tempContext.scale(-1, 1);
+        tempContext.drawImage(videoElement, -tempCanvas.width, 0, tempCanvas.width, tempCanvas.height);
+    } else {
+        // Dibujar sin volteo
+        tempContext.drawImage(videoElement, 0, 0, tempCanvas.width, tempCanvas.height);
+    }
+
+    tempContext.restore();
+
     // Convertir el contenido del canvas a un archivo PNG
-    const imageData = canvas.toDataURL("image/png");
+    const imageData = tempCanvas.toDataURL("image/png");
 
     let rfc = $('#Select_SearchEmpleado').val();
     let ClaveEmpleado = $('#Select_SearchEmpleado option:selected').text();
@@ -492,13 +540,13 @@ const capturarImagen = async () => {
 
 
 
-    
+
     if (rfc == null) {
         AlertStackingWithIcon_Mostrar("warning", 'Debes ecribir tu clave de empleado', "fa-times-circle");
         quitLoadingButton("#Registrar")
         return false;
     }
-   
+
     // Enviar la imagen al servidor
     try {
         const response = await fetch($("#urlGuardarFoto").data("action-url"), {
@@ -676,3 +724,20 @@ function quitLoadingButton(id) {
 }
 
 //#endregion startLoadingButton
+
+
+function stopCamera(videoElement) {
+    if (videoElement.srcObject) {
+        let stream = videoElement.srcObject;
+        let tracks = stream.getTracks();
+
+        tracks.forEach(track => track.stop()); // Detiene cada pista (audio/video)
+        videoElement.srcObject = null; // Limpia el objeto de la cámara
+    }
+}
+
+window.addEventListener("beforeunload", () => {
+    const videoElement = document.getElementById('video');
+
+    stopCamera(videoElement);
+});
