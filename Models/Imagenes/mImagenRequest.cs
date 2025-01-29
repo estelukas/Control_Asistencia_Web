@@ -8,5 +8,6 @@
         public string Rfc { get; set; } // rfc del empleado
         public string ClaveEmpleado { get; set; } // Clave del empleado
         public string TipoAsistencia { get; set; } // Tipo de asistencia, entrada o salida
+        public string IdGeocerca { get; set; } // Tipo de asistencia, entrada o salida
     }
 }
