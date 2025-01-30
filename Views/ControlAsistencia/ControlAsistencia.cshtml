@@ -120,30 +120,33 @@
 
 <body class="bg-light">
 
-    <div id="divContenedorGps" class="container py-4" style="display: none">
-        <div class="card shadow-lg p-3 mb-4 bg-body rounded border border-warning mx-auto" style="max-width: 600px; width: 100%;">
-            <div class="card-body text-center py-3">
-                <p>
-                    <i class="fas fa-7x fa-map-marker-alt text-warning"></i>
-                </p>
-                <h2 class="mb-3 text-warning">Activa los permisos de la Ubicación</h2>
-                <p style="font-size: 18px;">
-                    Para continuar, <strong>por favor permite el acceso a la ubicación.</strong>
-                </p>
-            </div>
-            <div class="container d-flex align-items-center justify-content-center py-3">
-                <button id="recargarButtonGps" class="btn btn-warning">Permitir Ubicación</button>
+    <div id="divContenedorWebNoSoportado"></div>
+
+    <div id="divContenedores">
+        <div id="divContenedorGps" class="container py-4" style="display: none">
+            <div class="card shadow-lg p-3 mb-4 bg-body rounded border border-warning mx-auto" style="max-width: 600px; width: 100%;">
+                <div class="card-body text-center py-3">
+                    <p>
+                        <i class="fas fa-7x fa-map-marker-alt text-warning"></i>
+                    </p>
+                    <h2 class="mb-3 text-warning">Activa los permisos de la Ubicación</h2>
+                    <p style="font-size: 18px;">
+                        Para continuar, <strong>por favor permite el acceso a la ubicación.</strong>
+                    </p>
+                </div>
+                <div class="container d-flex align-items-center justify-content-center py-3">
+                    <button id="recargarButtonGps" class="btn btn-warning">Permitir Ubicación</button>
+                </div>
             </div>
         </div>
+
+
+        <div id="divContenedorCamaraContainer"></div>
+
+        <div id="controlAsistenciaContainer"></div>
+
+        <div id="divContenedorErrorGeocercaContainer"></div>
     </div>
-
-
-    <div id="divContenedorCamaraContainer"></div>
-
-
-    <div id="controlAsistenciaContainer"></div>
-
-    <div id="divContenedorErrorGeocercaContainer"></div>
 
 
 
@@ -152,10 +155,10 @@
     <div id="urlValidarGeocerca" data-action-url="@Url.Action("Control_Asistencia_ValidarGeocerca", "ControlAsistencia")"></div>
     <div id="urlCargarContenedorCamara" data-action-url="@Url.Action("CargarContenedorCamara", "ControlAsistencia")"></div>
     <div id="urlCargarControlAsistencia" data-action-url="@Url.Action("CargarControlAsistencia", "ControlAsistencia")"></div>
+    <div id="urlDetectarBrave" data-action-url="@Url.Action("SetBraveDetection", "ControlAsistencia")"></div>
     <!-- Script -->
     @section Scripts {
         <script src="~/js/ControlAsistencia.js" asp-append-version="true"></script>
-
     }
 </body>
 

@@ -22,17 +22,70 @@ let IdCentroServicio = 0;
 let CentroServicio = '';
 let htmlContent;
 $(document).ready(() => {
-    if (!isMobile()) {
-        verificarPermisos();
-    }
-    $('#divContenedorCamara').hide();
-    $('#divControlAsistencia').hide();
+    let esBrave = (navigator.brave !== undefined);
 
-    // Inicia el flujo solicitando permisos de ubicación
-    solicitarPermisoUbicacion();
+    if (esBrave) {
+        var userAgent = navigator.userAgent;
+        // 1. Detección por User Agent
+        var isChrome = /Chrome/.test(userAgent) &&
+            !/Edg|Opera|OPR/.test(userAgent); // Excluye Edge, Opera
+
+        // 2. Detección específica de Brave (usando API del navegador)
+        var isBrave = typeof navigator.brave !== 'undefined';
+
+        // Si NO es Chrome o SI es Brave
+        if (!isChrome || isBrave) {
+            
+            cargarContenedorWebNoSoportado();
+            $("head").empty(); // Elimina todos los estilos/scripts
+            $("#divContenedores").remove();
+        }
+        
+    } else {
+        if (!isMobile()) {
+            verificarPermisos();
+        }
+        $('#divContenedorCamara').hide();
+        $('#divControlAsistencia').hide();
+
+        // Inicia el flujo solicitando permisos de ubicación
+        solicitarPermisoUbicacion();
+    }
 });
 
+
 //#endregion
+
+//#region Cargar Contenedor Web no Soportado
+
+//#region Cargar Contenedor Camara
+
+const cargarContenedorWebNoSoportado = async () => {
+    try {
+        const response = await fetch($("#urlDetectarBrave").data("action-url"), {
+            method: "GET",
+            headers: {
+                "Content-Type": "text/html",
+            },
+        });
+
+        if (response.ok) {
+            const htmlContent = await response.text();
+            // Cargar el contenido dinámico en el contenedor
+            $("#divContenedorWebNoSoportado").html(htmlContent);
+
+        } else {
+            console.error("Error al cargar el partial view del contenedor de Web No Soportado:", response.statusText);
+        }
+    } catch (error) {
+        console.error("Error al cargar el contenedor de Web No Soportado:", error);
+    }
+};
+
+
+//#endregion Cargar Contenedor Camara
+
+//#endregion Cargar Contenedor Web no Soportado
 
 //#region Funciones de Permisos
 
