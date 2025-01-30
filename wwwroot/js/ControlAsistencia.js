@@ -22,6 +22,7 @@ let IdCentroServicio = 0;
 let CentroServicio = '';
 let htmlContent;
 $(document).ready(() => {
+    $('#loadingScreen').show();
     if (!isMobile()) {
         verificarPermisos();
     }
@@ -29,7 +30,11 @@ $(document).ready(() => {
     $('#divControlAsistencia').hide();
 
     // Inicia el flujo solicitando permisos de ubicación
-    solicitarPermisoUbicacion();
+    solicitarPermisoUbicacion().finally(() => {
+        setTimeout(() => {
+            $('#loadingScreen').fadeOut(); // Oculta la pantalla de carga al terminar
+        }, 2000);
+    });
 });
 
 //#endregion
@@ -225,7 +230,7 @@ $('#recargarButtonGps').on('click', () => {
     location.reload();
 });
 
-$('#recargarButtonCamara').on('click', () => {
+$(document).on('click', '#recargarButtonCamara',() => {
     location.reload();
 });
 
