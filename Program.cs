@@ -52,12 +52,12 @@ app.Use(async (context, next) =>
     bool esChrome = userAgent.Contains("Chrome") || userAgent.Contains("CriOS");
     bool esEdge = userAgent.Contains("Edg");
     bool esBrave = userAgent.Contains("Brave");
+    bool esSafariPuro = userAgent.Contains("Safari") && !userAgent.Contains("Chrome") && !userAgent.Contains("CriOS");
 
-
-    // Verificar si no es Chrome o si es Edge (que también contiene 'Chrome' en el User-Agent)
-    if (!esChrome || esEdge || esBrave)
+    // Permitir solo Chrome (incluyendo Chrome en iOS "CriOS") y Safari puro, y bloquear Edge y Brave
+    if (!(esChrome || esSafariPuro) || esEdge || esBrave)
     {
-        // Renderizar el Partial View si no es Chrome
+        // Renderizar el Partial View si no es Chrome o Safari puro
         context.Response.StatusCode = 200;
         context.Response.ContentType = "text/html";
         var partialViewContent = await ViewRenderHelper.RenderPartialViewToString(context, "_UnsupportedBrowser");
