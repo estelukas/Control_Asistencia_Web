@@ -613,7 +613,7 @@ const capturarImagen = async () => {
 
 
     if (rfc == null) {
-        AlertStackingWithIcon_Mostrar("warning", 'Debes ecribir tu clave de empleado', "fa-times-circle");
+        AlertStackingWithIcon_Mostrar("warning", 'Debes escribir tu clave de empleado', "fa-times-circle");
         quitLoadingButton("#Registrar")
         return false;
     }
