@@ -49,8 +49,13 @@ app.Use(async (context, next) =>
 {
     var userAgent = context.Request.Headers["User-Agent"].ToString();
 
+    bool esChrome = userAgent.Contains("Chrome") || userAgent.Contains("CriOS");
+    bool esEdge = userAgent.Contains("Edg");
+    bool esBrave = userAgent.Contains("Brave");
+
+
     // Verificar si no es Chrome o si es Edge (que también contiene 'Chrome' en el User-Agent)
-    if (!userAgent.Contains("Chrome") || userAgent.Contains("Edg"))
+    if (!esChrome || esEdge || esBrave)
     {
         // Renderizar el Partial View si no es Chrome
         context.Response.StatusCode = 200;
