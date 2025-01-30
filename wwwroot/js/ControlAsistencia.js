@@ -35,26 +35,34 @@ $(document).ready(() => {
 
         // Si NO es Chrome o SI es Brave
         if (!isChrome || isBrave) {
-            
+            $('#loadingScreen').hide().css({ 'display': 'none', 'visibility': 'hidden', });
             cargarContenedorWebNoSoportado();
             $("head").empty(); // Elimina todos los estilos/scripts
             $("#divContenedores").remove();
         }
-        
+
     } else {
-        $('#loadingScreen').show();
+        $('#loadingScreen').hide(); 
+        // Establece un tiempo de espera antes de proceder
         if (!isMobile()) {
             verificarPermisos();
         }
+
+        // Oculta los contenedores de la cámara y control de asistencia
         $('#divContenedorCamara').hide();
         $('#divControlAsistencia').hide();
 
-    // Inicia el flujo solicitando permisos de ubicación
-    solicitarPermisoUbicacion().finally(() => {
-        setTimeout(() => {
-            $('#loadingScreen').fadeOut(); // Oculta la pantalla de carga al terminar
-        }, 2000);
-    });
+        // Inicia el flujo solicitando permisos de ubicación
+        solicitarPermisoUbicacion().finally(() => {
+            // Después de obtener los permisos, ocultamos la pantalla de carga
+            setTimeout(() => {
+                $('#loadingScreen').fadeOut();  // Animación para ocultar la pantalla de carga
+                $('#loadingScreen').hide();     // Asegura que se oculte completamente
+            }, 2000);  // Establece un retraso de 2 segundos (2000 milisegundos)
+
+        });
+
+    }
 });
 
 
