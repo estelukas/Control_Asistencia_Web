@@ -377,13 +377,35 @@ const EmpleadoConsultarDatosSelectData = async (searchTerm = "") => {
                 $('#select-dropdown-container-Select_SearchEmpleado .select-no-results').hide();
 
                 // Evento para detectar cambios en el select y actualizar las horas de entrada/salida
+                // Evento para detectar cambios en el select y actualizar las horas de entrada/salida y bloquear radios
                 $('#Select_SearchEmpleado').off('change').on('change', function () {
                     const selectedRFC = $(this).val();
                     const empleadoSeleccionado = empleados.find(emp => emp.RFC === selectedRFC);
 
                     if (empleadoSeleccionado) {
+                        // Formatear y mostrar las horas de entrada y salida
                         $("#horaEntrada").text(`Entrada: ${empleadoSeleccionado.Hora_Entrada !== "No registra" ? formatHora(empleadoSeleccionado.Hora_Entrada) : ""}`);
                         $("#horaSalida").text(`Salida: ${empleadoSeleccionado.Hora_Salida !== "No registra" ? formatHora(empleadoSeleccionado.Hora_Salida) : ""}`);
+
+                        // Deshabilitar/Habilitar radios según si el empleado ya tiene una hora registrada
+                        if (empleadoSeleccionado.Hora_Entrada !== "No registra") {
+                            $('#entradaOption').prop('disabled', true);
+                        } else {
+                            $('#entradaOption').prop('disabled', false);
+                        }
+
+                        if (empleadoSeleccionado.Hora_Salida !== "No registra") {
+                            $('#salidaOption').prop('disabled', true);
+                        } else {
+                            $('#salidaOption').prop('disabled', false);
+                        }
+
+                        // Seleccionar automáticamente la opción que sí está habilitada
+                        if (!$('#entradaOption').prop('disabled')) {
+                            $('#entradaOption').prop('checked', true);
+                        } else if (!$('#salidaOption').prop('disabled')) {
+                            $('#salidaOption').prop('checked', true);
+                        }
                     }
                 });
 
@@ -494,6 +516,37 @@ function fillMDBSelect(id, optionsArray) {
 
 //#endregion fillMDBSelect
 
+//#region setSelectValue
+
+function setSelectValue(id, value) {
+    // Verificar si el valor es null o undefined
+    if (value === null || value === undefined) {
+        return;
+    }
+
+    var selectElement = $(id); // Seleccionamos el elemento
+
+    // Verificar si el elemento existe
+    if (!selectElement.length) {
+        console.warn(`El elemento con id ${id} no existe.`);
+        return;
+    }
+
+    var selectInstance = mdb.Select.getInstance(selectElement);
+
+    // Destruir la instancia existente del componente Select si existe
+    if (selectInstance) {
+        selectInstance.dispose();
+    }
+
+    // Establecer el nuevo valor
+    var select = new mdb.Select(selectElement[0]);
+    select.setValue(value.toString());
+}
+
+
+//#endregion setSelectValue
+
 //#region tomar foto y guardar en ftp
 
 const capturarImagen = async () => {
@@ -585,10 +638,12 @@ const capturarImagen = async () => {
             const result = await response.json();
             console.log(result);
             if (result.id) {
+                resetearFormulario();
                 AlertStackingWithIcon_Mostrar("success", result.contenido, "fa-times-circle");
                 quitLoadingButton("#Registrar")
 
             } else {
+                resetearFormulario();
                 AlertStackingWithIcon_Mostrar("warning", result.contenido, "fa-times-circle");
                 quitLoadingButton("#Registrar")
 
@@ -598,10 +653,40 @@ const capturarImagen = async () => {
         }
     } catch (error) {
         console.error('Error:', error);
+        resetearFormulario();
         AlertStackingWithIcon_Mostrar("danger", 'No se pudo guardar la imagen.', "fa-times-circle");
         quitLoadingButton("#Registrar")
     }
 };
+
+
+//#region Resetear Entrada Salida Empleado
+
+const resetearFormulario = () => {
+    seleccionarEntradaSalidaPorDefecto();
+
+    setSelectValue("#Select_SearchEmpleado", 0);
+    let selectElement = $('#Select_SearchEmpleado');
+    selectElement.empty(); // Limpiar el select completamente
+    selectElement.removeClass('disabled'); // Asegurarse de que el select esté habilitado
+    $('#select-dropdown-container-Select_SearchEmpleado .select-no-results').hide(); // Ocultar "Sin resultados"
+
+    setTimeout(() => {
+        // Quitar la clase "active" del label de manera explícita
+        $("#select-wrapper-Select_SearchEmpleado .form-label.select-label").removeClass("active");
+    }, 100);
+
+    // Eliminar el div de "Seleccionar"
+    $("#select-wrapper-Select_SearchEmpleado .select-fake-value").remove();
+
+    // Restablecer el texto de las etiquetas de entrada/salida
+    $("#horaEntrada").text('Entrada: ');
+    $("#horaSalida").text('Salida: ');
+};
+
+
+//#endregion Resetear Entrada Salida Empleado
+
 //#endregion tomar foto y guardar en ftp//#endregion tomar foto y guardar en ftp
 
 //#region detectar rostros
