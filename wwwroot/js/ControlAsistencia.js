@@ -42,15 +42,19 @@ $(document).ready(() => {
         }
         
     } else {
+        $('#loadingScreen').show();
         if (!isMobile()) {
             verificarPermisos();
         }
         $('#divContenedorCamara').hide();
         $('#divControlAsistencia').hide();
 
-        // Inicia el flujo solicitando permisos de ubicación
-        solicitarPermisoUbicacion();
-    }
+    // Inicia el flujo solicitando permisos de ubicación
+    solicitarPermisoUbicacion().finally(() => {
+        setTimeout(() => {
+            $('#loadingScreen').fadeOut(); // Oculta la pantalla de carga al terminar
+        }, 2000);
+    });
 });
 
 
@@ -58,7 +62,6 @@ $(document).ready(() => {
 
 //#region Cargar Contenedor Web no Soportado
 
-//#region Cargar Contenedor Camara
 
 const cargarContenedorWebNoSoportado = async () => {
     try {
@@ -83,7 +86,6 @@ const cargarContenedorWebNoSoportado = async () => {
 };
 
 
-//#endregion Cargar Contenedor Camara
 
 //#endregion Cargar Contenedor Web no Soportado
 
@@ -278,7 +280,7 @@ $('#recargarButtonGps').on('click', () => {
     location.reload();
 });
 
-$('#recargarButtonCamara').on('click', () => {
+$(document).on('click', '#recargarButtonCamara',() => {
     location.reload();
 });
 
@@ -666,7 +668,7 @@ const capturarImagen = async () => {
 
 
     if (rfc == null) {
-        AlertStackingWithIcon_Mostrar("warning", 'Debes ecribir tu clave de empleado', "fa-times-circle");
+        AlertStackingWithIcon_Mostrar("warning", 'Debes escribir tu clave de empleado', "fa-times-circle");
         quitLoadingButton("#Registrar")
         return false;
     }
