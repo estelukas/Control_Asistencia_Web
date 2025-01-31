@@ -143,9 +143,15 @@ namespace XCF_Web_Control_Asistencia.Controllers.ControlAsistencia
             return PartialView("_ContenedorCamaraPartial");
         }
 
-        #endregion Renderizar Contenedor Camara
+        #endregion Renderizar Contenedor Web No Soportado
 
-        #endregion Control Asistencia
+
+        public IActionResult SetBraveDetection()
+        {
+            return PartialView("_UnsupportedBrowser");
+        }
+
+        #endregion Renderizar Contenedor Web No Soportado
 
 
 
