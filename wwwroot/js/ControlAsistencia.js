@@ -50,8 +50,13 @@ $(document).ready(() => {
         $('#divControlAsistencia').hide();
 
         // Inicia el flujo solicitando permisos de ubicación
-        solicitarPermisoUbicacion();
-        loadingScreen();
+        solicitarPermisoUbicacion().finally(() => {
+            if (isMobile())
+                loadingScreen();
+        });
+        if (!isMobile()) {
+            loadingScreen();
+        }
     }
 });
 
@@ -319,20 +324,30 @@ const verificarPermisos = () => {
     navigator.permissions.query({ name: 'camera' }).then(function (permissionStatus) {
         if (permissionStatus.state !== "granted") {
             // Si los permisos de cámara no están otorgados, mostrar el div de restablecer permisos
+            $("#divContenedorCamaraContainer").show().css({
+                display: "block",
+                visibility: "visible",
+                opacity: "1",
+            });
             $('#divControlAsistencia').hide();
             $('#divContenedorCamara').show();
         }
         permissionStatus.onchange = function () {
             if (permissionStatus.state !== "granted") {
                 // Si los permisos de cámara no están otorgados, mostrar el div de restablecer permisos
+                $("#divContenedorCamaraContainer").show().css({
+                    display: "block",
+                    visibility: "visible",
+                    opacity: "1",
+                });
                 $('#divControlAsistencia').hide();
                 $('#divContenedorCamara').show();
 
             }
         };
     });
-}
 
+}
 //#endregion
 
 //#region Cargar Control Asistencia
@@ -468,6 +483,8 @@ const EmpleadoConsultarDatosSelectData = async (searchTerm = "") => {
                         } else if (!$('#salidaOption').prop('disabled')) {
                             $('#salidaOption').prop('checked', true);
                         }
+                    } else {
+                        resetearFormulario(); 
                     }
                 });
 
@@ -493,6 +510,16 @@ const formatHora = (hora) => {
     return date.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit', hour12: true });
 };
 
+$(document).on('closed.mdb.select', '#Select_SearchEmpleado', function () {
+    if ($('#Select_SearchEmpleado').val() === '') {
+        setSelectValue("#Select_SearchEmpleado", 0);
+        $('#Select_SearchEmpleado').empty(); // Limpiar el select completamente
+        $('#Select_SearchEmpleado').prop('disabled', false); // Asegurarse de que el select esté habilitado
+        $('#select-dropdown-container-Select_SearchEmpleado .select-no-results').hide(); // Ocultar "Sin resultados"
+    }
+});
+
+
 //#endregion
 
 //#region Eventos del Select_SearchEmpleado
@@ -500,7 +527,6 @@ const formatHora = (hora) => {
 // Event listener para el cambio en el input de búsqueda
 $(document).on('input', '.form-control.select-filter-input', function () {
     const searchTerm = $(this).val().trim(); // Captura el texto del buscador
-
     // Si hay texto, ocultar el mensaje de "Sin resultados"
     if (searchTerm.length > 0) {
         $('#select-dropdown-container-Select_SearchEmpleado .select-no-results').hide();
@@ -517,26 +543,32 @@ $(document).on('input', '.form-control.select-filter-input', function () {
     }
 });
 
-// Manejar la selección de un empleado en el dropdown
-$('#Select_SearchEmpleado').on('change', function () {
-    const selectedValue = $(this).val(); // Obtén el valor seleccionado
-    const selectedText = $(this).find(':selected').text(); // Obtén el texto seleccionado
-});
-
-// Desactivar el comportamiento de sincronización automática del input visible con el campo de búsqueda
-$(document).on('click', '.select-option', function (e) {
-    e.stopPropagation(); // Prevenir que el clic actualice automáticamente el input visible
-});
-
 //#endregion
+
+//#region On click SearhEmpleado
+
+// Delegar el evento de clic en el contenedor de las opciones
+$(document).on('click', '.select-option', function () {
+    const selectedOption = $(this); // La opción que fue clickeada
+
+    // Asegurarnos de que solo la opción seleccionada tenga el atributo aria-selected="true"
+    $('.select-option').attr('aria-selected', 'false');  // Restablecer todas las opciones
+    selectedOption.attr('aria-selected', 'true');  // Marcar como seleccionada la opción clickeada
+
+    // Simular un segundo clic en la MISMA opción seleccionada
+    setTimeout(function () {
+        selectedOption.trigger("click"); // Vuelve a disparar el clic en la misma opción
+    }, 50); // Esperamos medio segundo antes de hacer el segundo clic
+});
+
+//#endregion On click SearhEmpleado
 
 //#region fillMDBSelect
 
 // Función para llenar el select con MDBootstrap
 function fillMDBSelect(id, optionsArray) {
-    var selectElement = $(id); // Seleccionar el elemento
-    const selectInstance = mdb.Select.getInstance(selectElement[0]); // Obtener instancia actual
 
+    var selectElement = $(id); // Seleccionar el elemento
     selectElement.empty(); // Vaciar el contenido del select
 
     if (optionsArray.length === 0) {
@@ -572,6 +604,7 @@ function fillMDBSelect(id, optionsArray) {
         });
 
         selectElement.prop("disabled", false);
+        
     }
 }
 
@@ -732,7 +765,8 @@ const resetearFormulario = () => {
     selectElement.empty(); // Limpiar el select completamente
     selectElement.removeClass('disabled'); // Asegurarse de que el select esté habilitado
     $('#select-dropdown-container-Select_SearchEmpleado .select-no-results').hide(); // Ocultar "Sin resultados"
-
+    $('#entradaOption').prop('disabled', false); // Habilitar entradaOption
+    $('#salidaOption').prop('disabled', false); // Habilitar salidaOption
     setTimeout(() => {
         // Quitar la clase "active" del label de manera explícita
         $("#select-wrapper-Select_SearchEmpleado .form-label.select-label").removeClass("active");
