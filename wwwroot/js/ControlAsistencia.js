@@ -42,26 +42,16 @@ $(document).ready(() => {
         }
 
     } else {
-        $('#loadingScreen').hide(); 
-        // Establece un tiempo de espera antes de proceder
+        $('#loadingScreen').show();
         if (!isMobile()) {
             verificarPermisos();
         }
-
-        // Oculta los contenedores de la cámara y control de asistencia
         $('#divContenedorCamara').hide();
         $('#divControlAsistencia').hide();
 
         // Inicia el flujo solicitando permisos de ubicación
-        solicitarPermisoUbicacion().finally(() => {
-            // Después de obtener los permisos, ocultamos la pantalla de carga
-            setTimeout(() => {
-                $('#loadingScreen').fadeOut();  // Animación para ocultar la pantalla de carga
-                $('#loadingScreen').hide();     // Asegura que se oculte completamente
-            }, 2000);  // Establece un retraso de 2 segundos (2000 milisegundos)
-
-        });
-
+        solicitarPermisoUbicacion();
+        loadingScreen();
     }
 });
 
@@ -297,6 +287,15 @@ $(document).on('click', '#recargarButtonGeocerca', async  () => {
 });
 
 //#endregion
+
+//#region Pantalla de Carga
+const loadingScreen = () => {
+    setTimeout(() => {
+        $('#loadingScreen').fadeOut(); // Oculta la pantalla de carga al terminar
+    }, 2000);
+}
+
+//#endregion Pantalla de Carga
 
 //#region Verificación de permisos dinámicos
 
@@ -892,6 +891,7 @@ function quitLoadingButton(id) {
 
 //#endregion startLoadingButton
 
+//#region Stop Camara
 
 function stopCamera(videoElement) {
     if (videoElement.srcObject) {
@@ -908,3 +908,5 @@ window.addEventListener("beforeunload", () => {
 
     stopCamera(videoElement);
 });
+
+//#endregion Stop Camara
