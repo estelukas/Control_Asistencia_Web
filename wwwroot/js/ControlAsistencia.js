@@ -22,22 +22,70 @@ let IdCentroServicio = 0;
 let CentroServicio = '';
 let htmlContent;
 $(document).ready(() => {
-    $('#loadingScreen').show();
-    if (!isMobile()) {
-        verificarPermisos();
-    }
-    $('#divContenedorCamara').hide();
-    $('#divControlAsistencia').hide();
+    let esBrave = (navigator.brave !== undefined);
 
-    // Inicia el flujo solicitando permisos de ubicación
-    solicitarPermisoUbicacion().finally(() => {
-        setTimeout(() => {
-            $('#loadingScreen').fadeOut(); // Oculta la pantalla de carga al terminar
-        }, 2000);
-    });
+    if (esBrave) {
+        var userAgent = navigator.userAgent;
+        // 1. Detección por User Agent
+        var isChrome = /Chrome/.test(userAgent) &&
+            !/Edg|Opera|OPR/.test(userAgent); // Excluye Edge, Opera
+
+        // 2. Detección específica de Brave (usando API del navegador)
+        var isBrave = typeof navigator.brave !== 'undefined';
+
+        // Si NO es Chrome o SI es Brave
+        if (!isChrome || isBrave) {
+            $('#loadingScreen').hide().css({ 'display': 'none', 'visibility': 'hidden', });
+            cargarContenedorWebNoSoportado();
+            $("head").empty(); // Elimina todos los estilos/scripts
+            $("#divContenedores").remove();
+        }
+
+    } else {
+        $('#loadingScreen').show();
+        if (!isMobile()) {
+            verificarPermisos();
+        }
+        $('#divContenedorCamara').hide();
+        $('#divControlAsistencia').hide();
+
+        // Inicia el flujo solicitando permisos de ubicación
+        solicitarPermisoUbicacion();
+        loadingScreen();
+    }
 });
 
+
 //#endregion
+
+//#region Cargar Contenedor Web no Soportado
+
+
+const cargarContenedorWebNoSoportado = async () => {
+    try {
+        const response = await fetch($("#urlDetectarBrave").data("action-url"), {
+            method: "GET",
+            headers: {
+                "Content-Type": "text/html",
+            },
+        });
+
+        if (response.ok) {
+            const htmlContent = await response.text();
+            // Cargar el contenido dinámico en el contenedor
+            $("#divContenedorWebNoSoportado").html(htmlContent);
+
+        } else {
+            console.error("Error al cargar el partial view del contenedor de Web No Soportado:", response.statusText);
+        }
+    } catch (error) {
+        console.error("Error al cargar el contenedor de Web No Soportado:", error);
+    }
+};
+
+
+
+//#endregion Cargar Contenedor Web no Soportado
 
 //#region Funciones de Permisos
 
@@ -239,6 +287,15 @@ $(document).on('click', '#recargarButtonGeocerca', async  () => {
 });
 
 //#endregion
+
+//#region Pantalla de Carga
+const loadingScreen = () => {
+    setTimeout(() => {
+        $('#loadingScreen').fadeOut(); // Oculta la pantalla de carga al terminar
+    }, 2000);
+}
+
+//#endregion Pantalla de Carga
 
 //#region Verificación de permisos dinámicos
 
@@ -834,6 +891,7 @@ function quitLoadingButton(id) {
 
 //#endregion startLoadingButton
 
+//#region Stop Camara
 
 function stopCamera(videoElement) {
     if (videoElement.srcObject) {
@@ -850,3 +908,5 @@ window.addEventListener("beforeunload", () => {
 
     stopCamera(videoElement);
 });
+
+//#endregion Stop Camara
