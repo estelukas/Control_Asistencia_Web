@@ -5,7 +5,7 @@ namespace XCF_Web_Control_Asistencia.Classes
 {
     public class cAES
     {
-        private static readonly byte[] _key = Encoding.UTF8.GetBytes("tctK7MWY3TTtjrOXyn4cRLPMSqQEVj2p");
+        private static readonly byte[] _key = Encoding.UTF8.GetBytes("tctK8MWY3TTtjrTXyn4cRLPMSqQEVj2n");
 
 
         /// <summary>

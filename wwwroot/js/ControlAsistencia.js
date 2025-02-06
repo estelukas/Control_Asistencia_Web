@@ -283,11 +283,11 @@ $('#recargarButtonGps').on('click', () => {
     location.reload();
 });
 
-$(document).on('click', '#recargarButtonCamara',() => {
+$(document).on('click', '#recargarButtonCamara', () => {
     location.reload();
 });
 
-$(document).on('click', '#recargarButtonGeocerca', async  () => {
+$(document).on('click', '#recargarButtonGeocerca', async () => {
     location.reload();
 });
 
@@ -451,7 +451,7 @@ const EmpleadoConsultarDatosSelectData = async (searchTerm = "") => {
                 fillMDBSelect('#Select_SearchEmpleado', optionsArray);
 
                 $('#Select_SearchEmpleado').prop('disabled', false);
-                $('#select-dropdown-container-Select_SearchEmpleado .select-no-results').hide();
+                //$('#select-dropdown-container-Select_SearchEmpleado .select-no-results').hide();
 
                 // Evento para detectar cambios en el select y actualizar las horas de entrada/salida
                 // Evento para detectar cambios en el select y actualizar las horas de entrada/salida y bloquear radios
@@ -473,8 +473,10 @@ const EmpleadoConsultarDatosSelectData = async (searchTerm = "") => {
 
                         if (empleadoSeleccionado.Hora_Salida !== "No registra") {
                             $('#salidaOption').prop('disabled', true);
+                            $('#Registrar').prop('disabled', true);
                         } else {
                             $('#salidaOption').prop('disabled', false);
+                            $('#Registrar').prop('disabled', false);
                         }
 
                         // Seleccionar automáticamente la opción que sí está habilitada
@@ -484,14 +486,13 @@ const EmpleadoConsultarDatosSelectData = async (searchTerm = "") => {
                             $('#salidaOption').prop('checked', true);
                         }
                     } else {
-                        resetearFormulario(); 
+                        resetearFormulario();
                     }
                 });
 
             } else {
-                console.error("Error en los datos del servidor");
                 $('#Select_SearchEmpleado').empty();
-                $('#select-dropdown-container-Select_SearchEmpleado .select-no-results').show();
+              //  $('#select-dropdown-container-Select_SearchEmpleado .select-no-results').show();
                 $('#Select_SearchEmpleado').prop('disabled', false);
             }
         } else {
@@ -510,14 +511,14 @@ const formatHora = (hora) => {
     return date.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit', hour12: true });
 };
 
-$(document).on('closed.mdb.select', '#Select_SearchEmpleado', function () {
-    if ($('#Select_SearchEmpleado').val() === '') {
-        setSelectValue("#Select_SearchEmpleado", 0);
-        $('#Select_SearchEmpleado').empty(); // Limpiar el select completamente
-        $('#Select_SearchEmpleado').prop('disabled', false); // Asegurarse de que el select esté habilitado
-        $('#select-dropdown-container-Select_SearchEmpleado .select-no-results').hide(); // Ocultar "Sin resultados"
-    }
-});
+//$(document).on('closed.mdb.select', '#Select_SearchEmpleado', function () {
+//    if ($('#Select_SearchEmpleado').val() === '') {
+//        setSelectValue("#Select_SearchEmpleado", 0);
+//        $('#Select_SearchEmpleado').empty(); // Limpiar el select completamente
+//        $('#Select_SearchEmpleado').prop('disabled', false); // Asegurarse de que el select esté habilitado
+//        $('#select-dropdown-container-Select_SearchEmpleado .select-no-results').hide(); // Ocultar "Sin resultados"
+//    }
+//});
 
 
 //#endregion
@@ -528,18 +529,18 @@ $(document).on('closed.mdb.select', '#Select_SearchEmpleado', function () {
 $(document).on('input', '.form-control.select-filter-input', function () {
     const searchTerm = $(this).val().trim(); // Captura el texto del buscador
     // Si hay texto, ocultar el mensaje de "Sin resultados"
-    if (searchTerm.length > 0) {
-        $('#select-dropdown-container-Select_SearchEmpleado .select-no-results').hide();
-    }
+    //if (searchTerm.length > 0) {
+    //    $('#select-dropdown-container-Select_SearchEmpleado .select-no-results').hide();
+    //}
 
     // Si el texto tiene al menos 4 caracteres, realiza la búsqueda
     if (searchTerm.length >= 4) {
         EmpleadoConsultarDatosSelectData(searchTerm); // Llama a la función de búsqueda
     } else if (searchTerm.length === 0) {
         // Si no hay texto, limpiar el select, eliminar "Sin datos" y ocultar "Sin resultados"
-        $('#Select_SearchEmpleado').empty(); // Limpiar el select completamente
-        $('#Select_SearchEmpleado').prop('disabled', false); // Asegurarse de que el select esté habilitado
-        $('#select-dropdown-container-Select_SearchEmpleado .select-no-results').hide(); // Ocultar "Sin resultados"
+     //   $('#Select_SearchEmpleado').empty(); // Limpiar el select completamente
+     //   $('#Select_SearchEmpleado').prop('disabled', false); // Asegurarse de que el select esté habilitado
+     //   $('#select-dropdown-container-Select_SearchEmpleado .select-no-results').hide(); // Ocultar "Sin resultados"
     }
 });
 
@@ -604,7 +605,7 @@ function fillMDBSelect(id, optionsArray) {
         });
 
         selectElement.prop("disabled", false);
-        
+
     }
 }
 
@@ -731,7 +732,6 @@ const capturarImagen = async () => {
         });
         if (response.ok) {
             const result = await response.json();
-            console.log(result);
             if (result.id) {
                 resetearFormulario();
                 AlertStackingWithIcon_Mostrar("success", result.contenido, "fa-times-circle");
