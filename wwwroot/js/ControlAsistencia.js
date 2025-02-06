@@ -473,8 +473,12 @@ const EmpleadoConsultarDatosSelectData = async (searchTerm = "") => {
 
                         if (empleadoSeleccionado.Hora_Salida !== "No registra") {
                             $('#salidaOption').prop('disabled', true);
+                            $('#Registrar').prop('disabled', true);
+
                         } else {
                             $('#salidaOption').prop('disabled', false);
+                            $('#Registrar').prop('disabled', false);
+
                         }
 
                         // Seleccionar automáticamente la opción que sí está habilitada
@@ -489,7 +493,6 @@ const EmpleadoConsultarDatosSelectData = async (searchTerm = "") => {
                 });
 
             } else {
-                console.error("Error en los datos del servidor");
                 $('#Select_SearchEmpleado').empty();
                 $('#select-dropdown-container-Select_SearchEmpleado .select-no-results').show();
                 $('#Select_SearchEmpleado').prop('disabled', false);
