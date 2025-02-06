@@ -22,12 +22,12 @@ builder.Services.AddControllersWithViews();
 
 // Configurar la caché distribuida y la sesión
 builder.Services.AddDistributedMemoryCache();
-builder.Services.AddSession(options =>
-{
-    options.IdleTimeout = TimeSpan.FromMinutes(30);
-    options.Cookie.HttpOnly = true;
-    options.Cookie.IsEssential = true;
-});
+//builder.Services.AddSession(options =>
+//{
+//    options.IdleTimeout = TimeSpan.FromMinutes(30);
+//    options.Cookie.HttpOnly = true;
+//    options.Cookie.IsEssential = true;
+//});
 
 // Agregar servicio HTTP y ApiHandler como singleton
 builder.Services.AddHttpClient();
@@ -42,7 +42,7 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
 app.UseAuthorization();
-app.UseSession();
+//app.UseSession();
 
 // Middleware para la verificación de navegador
 app.Use(async (context, next) =>
@@ -70,7 +70,7 @@ app.Use(async (context, next) =>
     }
 });
 // Verifica si el navegador es Chrome
-app.UseSession();
+//app.UseSession();
 
 // Configurar rutas
 app.MapControllerRoute(
