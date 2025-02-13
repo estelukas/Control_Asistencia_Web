@@ -163,19 +163,23 @@
 
         <div id="divContenedorCamaraContainer"></div>
 
-        <div id="controlAsistenciaContainer"></div>
+        <div id="controlAsistenciaContainer">
+
+            
+
+        </div>
 
         <div id="divContenedorErrorGeocercaContainer"></div>
     </div>
 
-
-
+   
     <div id="urlSeleccionarDatos" data-action-url="@Url.Action("Control_Asistencia_SeleccionarDatos", "ControlAsistencia")"></div>
     <div id="urlGuardarFoto" data-action-url="@Url.Action("Control_Asistencia_ServidorFTP_GuardarFoto", "ControlAsistencia")"></div>
     <div id="urlValidarGeocerca" data-action-url="@Url.Action("Control_Asistencia_ValidarGeocerca", "ControlAsistencia")"></div>
     <div id="urlCargarContenedorCamara" data-action-url="@Url.Action("CargarContenedorCamara", "ControlAsistencia")"></div>
     <div id="urlCargarControlAsistencia" data-action-url="@Url.Action("CargarControlAsistencia", "ControlAsistencia")"></div>
     <div id="urlDetectarBrave" data-action-url="@Url.Action("SetBraveDetection", "ControlAsistencia")"></div>
+    <div id="urlObtenerFotoFtp" data-action-url="@Url.Action("Control_Asistencia_ObtenerFotoFTP", "ControlAsistencia")"></div>
     <!-- Script -->
     @section Scripts {
         <script src="~/js/ControlAsistencia.js" asp-append-version="true"></script>

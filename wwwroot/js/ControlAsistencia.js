@@ -12,7 +12,9 @@ const isMobile = () => {
 let isFlipped = false;
 const tempCanvas = document.createElement("canvas");
 const tempContext = tempCanvas.getContext("2d");
-
+let SonIguales = false;
+let fotoRH = false;
+let base64WithPrefix;
 //#endregion Variables Globales
 
 //#region Carga Inicial
@@ -191,6 +193,9 @@ const solicitarPermisoCamara = async () => {
 // Función para inicializar la cámara
 const inicializarCamara = async () => {
     try {
+        await faceapi.nets.tinyFaceDetector.loadFromUri('./models');
+        await faceapi.nets.faceLandmark68Net.loadFromUri('./models');
+        await faceapi.nets.faceRecognitionNet.loadFromUri('./models');
         // Obtener los elementos del DOM
         const videoElement = document.getElementById('video');
         const canvas = document.getElementById("canvas");
@@ -208,7 +213,7 @@ const inicializarCamara = async () => {
         videoElement.addEventListener("loadeddata", () => {
             canvas.width = videoElement.videoWidth;
             canvas.height = videoElement.videoHeight;
-            detectFaces();
+         
         });
 
         // Detectar si es necesario aplicar un flip horizontal
@@ -220,6 +225,30 @@ const inicializarCamara = async () => {
             videoElement.style.transform = "none";
         }
 
+        video.addEventListener('play', async () =>
+        {
+            const displaySize = { width: canvas.width, height: canvas.height };
+            console.log(displaySize);
+            faceapi.matchDimensions(canvas, displaySize);
+            setInterval(async () => {
+                const detection = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions());
+                const resizedDetections = faceapi.resizeResults(detection, displaySize);
+                canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
+                const ctx = canvas.getContext('2d');
+                resizedDetections.forEach(det => {
+                    const { x, y, width, height } = det.box;
+                    ctx.beginPath();
+                    ctx.rect(x, y, width, height);
+                    ctx.lineWidth = 2;
+                    ctx.strokeStyle = "red";
+                    ctx.stroke();
+                })
+            }, 100);
+
+        });
+
+
+       
         // Evento para capturar imagen al hacer clic en el botón
         const botonCaptura = document.getElementById("Registrar");
         botonCaptura.addEventListener("click", capturarImagen);
@@ -378,6 +407,7 @@ const cargarControlAsistencia = async (estaEnGeocerca) => {
 //#endregion Cargar Control Asistencia
 
 //#region Cargar Contenedor Camara
+
 
 const cargarContenedorCamara = async () => {
     try {
@@ -644,6 +674,55 @@ function setSelectValue(id, value) {
 //#endregion setSelectValue
 
 //#region tomar foto y guardar en ftp
+async function cargarImagenFTP() {
+    try {
+        let rfc = $('#Select_SearchEmpleado').val();
+        const response = await fetch($("#urlObtenerFotoFtp").data("action-url"), {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({               
+                Rfc: rfc
+            })
+        });
+        if (response.ok) {
+            const result = await response.json();   
+            console.log(result);
+            if (result.id) {
+                // 🟢 Convertir la respuesta JSON en un objeto
+                const contenidoObj = JSON.parse(result.contenido);
+                // 🟢 Obtener la imagen en Base64 desde `FileName`
+                const base64String = contenidoObj;
+
+                if (contenidoObj != null) {
+                    fotoRH = true;
+                    if (!base64String.startsWith("data:image/")) {
+                        // Si no tiene el prefijo "data:image/", agregarlo
+                        base64WithPrefix = `data:image/png;base64,${base64String}`;
+                        document.getElementById("fotoFTP").src = base64WithPrefix;
+                    } else {
+                        // Si ya tiene el prefijo, asignar directamente
+                        document.getElementById("fotoFTP").src = base64String;
+                    }
+                } else {
+                    AlertStackingWithIcon_Mostrar("warning", 'Usted no cuenta con foto por parte del departamento de RH, favor de acudir con su gerente.', "fa-times-circle");
+                    fotoRH = false;
+                }
+            }
+        } else {
+            throw new Error('Error al guardar la imagen.');
+        }
+
+        if (!response.ok) {
+            throw new Error("No se pudo obtener la imagen");
+        }
+
+    } catch (error) {
+        console.error("Error:", error);
+        return false;
+    }
+}
 
 const capturarImagen = async () => {
     startLoadingButton("#Registrar")
@@ -685,9 +764,13 @@ const capturarImagen = async () => {
     }
 
     tempContext.restore();
+    const img1 = document.getElementById("fotoCamara");
+    await cargarImagenFTP();
 
     // Convertir el contenido del canvas a un archivo PNG
     const imageData = tempCanvas.toDataURL("image/png");
+    img1.src = imageData;
+   
 
     let rfc = $('#Select_SearchEmpleado').val();
     let ClaveEmpleado = $('#Select_SearchEmpleado option:selected').text();
@@ -704,14 +787,52 @@ const capturarImagen = async () => {
         quitLoadingButton("#Registrar")
         return 0;
     }
-
-
-
-
     if (rfc == null) {
         AlertStackingWithIcon_Mostrar("warning", 'Debes escribir tu clave de empleado', "fa-times-circle");
         quitLoadingButton("#Registrar")
         return false;
+    }
+
+    if (fotoRH) {
+
+        await faceapi.nets.tinyFaceDetector.loadFromUri('./models');
+        await faceapi.nets.faceLandmark68Net.loadFromUri('./models');
+        await faceapi.nets.faceRecognitionNet.loadFromUri('./models');
+       
+
+        // Obtener imágenes
+        const img11 = document.getElementById("fotoCamara");
+        const img22 = document.getElementById("fotoFTP");
+
+        // Detectar y extraer embeddings
+        const detection1 = await faceapi.detectSingleFace(img11, new faceapi.TinyFaceDetectorOptions())
+            .withFaceLandmarks()
+            .withFaceDescriptor();
+
+        const detection2 = await faceapi.detectSingleFace(img22, new faceapi.TinyFaceDetectorOptions())
+            .withFaceLandmarks()
+            .withFaceDescriptor();
+
+        // Verificar si se detectaron rostros
+        if (detection1 && detection2) {
+            // Calcular la distancia euclidiana entre los embeddings
+            const distance = faceapi.euclideanDistance(detection1.descriptor, detection2.descriptor);
+            // Definir un umbral (ajusta según tu caso)
+            const threshold = 0.6;
+            if (distance < threshold) {
+               // console.log('Los rostros son de la misma persona. Distancia: ' + distance.toFixed(2));
+                SonIguales = true;
+            } else {
+               // console.log('Los rostros son de personas diferentes. Distancia: ' + distance.toFixed(2));
+                SonIguales = false;
+            }
+        } else {
+            //console.log('No se detectaron rostros en una o ambas imágenes.');
+            SonIguales = false;
+        }
+
+    } else {
+        SonIguales = false;
     }
     // Enviar la imagen al servidor
     try {
@@ -727,7 +848,8 @@ const capturarImagen = async () => {
                 Rfc: rfc,
                 ClaveEmpleado: ClaveEmpleado,
                 TipoAsistencia: seleccionado,
-                IdGeocerca: IdCentroServicio.toString()
+                IdGeocerca: IdCentroServicio.toString(),
+                Boleano: SonIguales
             })
         });
         if (response.ok) {
@@ -735,25 +857,36 @@ const capturarImagen = async () => {
             if (result.id) {
                 resetearFormulario();
                 AlertStackingWithIcon_Mostrar("success", result.contenido, "fa-times-circle");
-                quitLoadingButton("#Registrar")
+                quitLoadingButton("#Registrar");
+                //SonIguales = false;
 
             } else {
                 resetearFormulario();
                 AlertStackingWithIcon_Mostrar("warning", result.contenido, "fa-times-circle");
-                quitLoadingButton("#Registrar")
-
+                quitLoadingButton("#Registrar");
+               // SonIguales = false;
             }
         } else {
             throw new Error('Error al guardar la imagen.');
+           // SonIguales = false;
         }
     } catch (error) {
         console.error('Error:', error);
         resetearFormulario();
         AlertStackingWithIcon_Mostrar("danger", 'No se pudo guardar la imagen.', "fa-times-circle");
-        quitLoadingButton("#Registrar")
+        quitLoadingButton("#Registrar");
+        //SonIguales = false;
     }
 };
-
+// Función para cargar una imagen desde Base64
+function loadImageFromBase64(base64) {
+    return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.src = base64;
+        img.onload = () => resolve(img);
+        img.onerror = (error) => reject(error);
+    });
+}
 
 //#region Resetear Entrada Salida Empleado
 
@@ -785,43 +918,6 @@ const resetearFormulario = () => {
 
 //#endregion tomar foto y guardar en ftp//#endregion tomar foto y guardar en ftp
 
-//#region detectar rostros
-async function detectFaces() {
-    const model = await blazeface.load();
-    const ctx = canvas.getContext("2d");
-    async function detect() {
-        const predictions = await model.estimateFaces(video, false);
-
-        // Limpiar el canvas antes de dibujar
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-        if (predictions.length > 0) {
-            predictions.forEach((prediction) => {
-                const start = prediction.topLeft;
-                const end = prediction.bottomRight;
-
-                // Escalar las coordenadas al tamaño del video/canvas
-                const x = start[0];
-                const y = start[1] - 40;
-                const width = end[0] - start[0];
-                const height = end[1] - start[1];
-
-                // Dibujar un rectángulo alrededor del rostro
-                ctx.beginPath();
-                ctx.lineWidth = 2;
-                ctx.strokeStyle = "red";
-                ctx.rect(x, y, width, height);
-                ctx.stroke();
-            });
-        }
-
-        // Repetir detección en el siguiente frame
-        requestAnimationFrame(detect);
-    }
-
-    detect();
-}
-//#endregion detectar rostros
 
 //#region Seleccionar Entrada Salida Por Defecto
 

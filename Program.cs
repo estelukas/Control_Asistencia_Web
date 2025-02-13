@@ -7,6 +7,7 @@ using System.IO;
 using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.FileProviders;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -39,11 +40,14 @@ var app = builder.Build();
 app.UseWebSockets();
 app.UseDefaultFiles();
 app.UseHttpsRedirection();
-app.UseStaticFiles();
+//app.UseStaticFiles();
 app.UseRouting();
 app.UseAuthorization();
 //app.UseSession();
-
+app.UseStaticFiles(new StaticFileOptions
+{
+    ServeUnknownFileTypes = true, // Permite archivos binarios
+});
 // Middleware para la verificación de navegador
 app.Use(async (context, next) =>
 {

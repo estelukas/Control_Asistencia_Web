@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using System.Reflection;
 using XCF_Web.Models.Genericos;
 using XCF_Web_Control_Asistencia.Classes;
 using XCF_Web_Control_Asistencia.Classes.Attributes;
@@ -141,6 +142,28 @@ namespace XCF_Web_Control_Asistencia.Controllers.ControlAsistencia
         public IActionResult CargarContenedorCamara()
         {
             return PartialView("_ContenedorCamaraPartial");
+        }
+
+        #endregion Renderizar Contenedor Web No Soportado
+
+        #region Obtener foto desde ftp
+        /// <summary>
+        /// Cargar la foto desde ftp
+        /// </summary>
+        /// <returns>Partial View</returns>
+        [HttpPost]
+        public IActionResult Control_Asistencia_ObtenerFotoFTP([FromBody] mImagenRequest model)
+        {
+            try
+            {
+                mSelect r = _apiHandler.PostAsync<mImagenRequest, mSelect>(_apiHandler.UrlControlAsistencia + "controlasistencia/Control_Asistencia_DescargarFotoFTP", model).Result;
+
+                return Json(r);
+            }
+            catch (Exception)
+            {
+                return BadRequest("Ocurrió un error, vuelve a intentarlo.");
+            }
         }
 
         #endregion Renderizar Contenedor Web No Soportado
