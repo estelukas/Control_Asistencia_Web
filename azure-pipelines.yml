@@ -1,0 +1,49 @@
+trigger:
+- ControlAsistencia  # 🔹 Habilita CI en la rama principal
+
+pool:
+  vmImage: 'windows-latest'
+
+variables:
+  solution: '**/*.sln'
+  buildPlatform: 'Any CPU'
+  buildConfiguration: 'Release'
+
+steps:
+- task: NuGetToolInstaller@1
+
+- task: NuGetCommand@2
+  inputs:
+    restoreSolution: '$(solution)'
+
+# 🔹 1️⃣ Preparar análisis con SonarQube
+- task: SonarQubePrepare@5
+  inputs:
+    SonarQube: 'SonarQube'  # ⚠️ Reemplaza con el nombre de tu conexión en Azure DevOps
+    scannerMode: 'MSBuild'
+    projectKey: 'ControlAsistencia_XCF_App_Control_Asistencia_f2a51de7-37ac-469b-954d-9e549b24489a'
+    projectName: 'ControlAsistencia_XCF_App'
+    extraProperties: |
+      sonar.exclusions=**/*.test.cs  # Excluir archivos de pruebas si es necesario
+
+# 🔹 2️⃣ Compilar solución
+- task: VSBuild@1
+  inputs:
+    solution: '$(solution)'
+    msbuildArgs: '/p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:DesktopBuildPackageLocation="$(build.artifactStagingDirectory)\WebApp.zip" /p:DeployIisAppPath="Default Web Site"'
+    platform: '$(buildPlatform)'
+    configuration: '$(buildConfiguration)'
+
+# 🔹 3️⃣ Ejecutar análisis de código con SonarQube
+- task: SonarQubeAnalyze@5
+
+# 🔹 4️⃣ Publicar resultados del análisis en SonarQube
+- task: SonarQubePublish@5
+  inputs:
+    pollingTimeoutSec: '300'
+
+# 🔹 5️⃣ Ejecutar pruebas unitarias
+- task: VSTest@2
+  inputs:
+    platform: '$(buildPlatform)'
+    configuration: '$(buildConfiguration)'
