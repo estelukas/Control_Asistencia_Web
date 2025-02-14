@@ -193,9 +193,9 @@ const solicitarPermisoCamara = async () => {
 // Función para inicializar la cámara
 const inicializarCamara = async () => {
     try {
-        await faceapi.nets.tinyFaceDetector.loadFromUri('./models');
-        await faceapi.nets.faceLandmark68Net.loadFromUri('./models');
-        await faceapi.nets.faceRecognitionNet.loadFromUri('./models');
+        await faceapi.nets.tinyFaceDetector.loadFromUri(window.location.origin + '/asistencia/models');
+        await faceapi.nets.faceLandmark68Net.loadFromUri(window.location.origin + '/asistencia/models');
+        await faceapi.nets.faceRecognitionNet.loadFromUri(window.location.origin + '/asistencia/models');
         // Obtener los elementos del DOM
         const videoElement = document.getElementById('video');
         const canvas = document.getElementById("canvas");
@@ -795,9 +795,9 @@ const capturarImagen = async () => {
 
     if (fotoRH) {
 
-        await faceapi.nets.tinyFaceDetector.loadFromUri('./models');
-        await faceapi.nets.faceLandmark68Net.loadFromUri('./models');
-        await faceapi.nets.faceRecognitionNet.loadFromUri('./models');
+        await faceapi.nets.tinyFaceDetector.loadFromUri(window.location.origin + '/asistencia/models');
+        await faceapi.nets.faceLandmark68Net.loadFromUri(window.location.origin + '/asistencia/models');
+        await faceapi.nets.faceRecognitionNet.loadFromUri(window.location.origin + '/asistencia/models');
        
 
         // Obtener imágenes
