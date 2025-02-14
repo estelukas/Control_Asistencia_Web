@@ -2,8 +2,8 @@ trigger:
 - ControlAsistencia  # 🔹 Habilita CI en la rama principal
 
 pool:
-  #vmImage: 'windows-latest'
-  name: Default
+  vmImage: 'windows-latest'
+  #name: Default
 
 variables:
   solution: '**/*.sln'
