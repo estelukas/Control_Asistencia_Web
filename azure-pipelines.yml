@@ -20,7 +20,7 @@ steps:
 - task: SonarQubePrepare@7
   inputs:
     SonarQube: 'SonarQube'  # ⚠️ Reemplaza con el nombre de tu conexión en Azure DevOps
-    scannerMode: 'MSBuild'
+    scannerMode: 'dotnet'
     projectKey: 'ControlAsistencia_XCF_App_Control_Asistencia_f2a51de7-37ac-469b-954d-9e549b24489a'
     projectName: 'ControlAsistencia_XCF_App'
     extraProperties: |
