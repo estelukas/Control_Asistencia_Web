@@ -24,7 +24,7 @@ steps:
     projectKey: 'ControlAsistencia_XCF_App_Control_Asistencia_f2a51de7-37ac-469b-954d-9e549b24489a'
     projectName: 'ControlAsistencia_XCF_App'
     extraProperties: |
-      sonar.host.url=http://localhost:9000  
+      sonar.host.url=http://localhost:9000
       sonar.sources=server
 
 
