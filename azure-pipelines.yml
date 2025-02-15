@@ -2,7 +2,8 @@ trigger:
 - ControlAsistencia  # 🔹 Habilita CI en la rama principal
 
 pool:
-  vmImage: 'windows-latest'
+ # vmImage: 'windows-latest'
+  name: Default
 
 variables:
   solution: '**/*.sln'
@@ -16,15 +17,17 @@ steps:
   inputs:
     restoreSolution: '$(solution)'
 
-# 🔹 1️⃣ Preparar análisis con SonarQube
-- task: SonarQubePrepare@5
+- task: SonarQubePrepare@7
   inputs:
-    SonarQube: 'SonarQube'  # ⚠️ Reemplaza con el nombre de tu conexión en Azure DevOps
-    scannerMode: 'MSBuild'
+    SonarQube: 'SonarQube'
+    scannerMode: 'dotnet'
     projectKey: 'ControlAsistencia_XCF_App_Control_Asistencia_f2a51de7-37ac-469b-954d-9e549b24489a'
     projectName: 'ControlAsistencia_XCF_App'
     extraProperties: |
-      sonar.exclusions=**/*.test.cs  # Excluir archivos de pruebas si es necesario
+      sonar.host.url=http://localhost:9000
+      sonar.coverageReportPaths=$(Agent.TempDirectory)/**/*.xml
+      sonar.branch.name=
+
 
 # 🔹 2️⃣ Compilar solución
 - task: VSBuild@1
@@ -35,10 +38,10 @@ steps:
     configuration: '$(buildConfiguration)'
 
 # 🔹 3️⃣ Ejecutar análisis de código con SonarQube
-- task: SonarQubeAnalyze@5
+- task: SonarQubeAnalyze@7
 
 # 🔹 4️⃣ Publicar resultados del análisis en SonarQube
-- task: SonarQubePublish@5
+- task: SonarQubePublish@7
   inputs:
     pollingTimeoutSec: '300'
 
@@ -47,3 +50,13 @@ steps:
   inputs:
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
+    testRunTitle: 'Unit Tests'
+    resultsFolder: '$(Agent.TempDirectory)\TestResults'
+
+- task: DotNetCoreCLI@2
+  displayName: 'Ejecutar pruebas con cobertura'
+  inputs:
+    command: 'test'
+    projects: '**/*Tests/*.csproj'
+    arguments: '--configuration $(buildConfiguration) --collect:"XPlat Code Coverage"'
+
