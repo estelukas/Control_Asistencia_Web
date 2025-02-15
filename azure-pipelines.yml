@@ -18,7 +18,7 @@ steps:
     restoreSolution: '$(solution)'
 
 # 🔹 1️⃣ Preparar análisis con SonarQube
-- task: SonarQubePrepare@7
+- task: SonarQubePrepare@5
   inputs:
     SonarQube: 'SonarQube'  # ⚠️ Reemplaza con el nombre de tu conexión en Azure DevOps
     scannerMode: 'dotnet'
@@ -26,6 +26,7 @@ steps:
     projectName: 'ControlAsistencia_XCF_App'
     extraProperties: |
       sonar.host.url=http://localhost:9000
+      sonar.sources=server
 
 # 🔹 2️⃣ Compilar solución
 - task: VSBuild@1
@@ -36,10 +37,10 @@ steps:
     configuration: '$(buildConfiguration)'
 
 # 🔹 3️⃣ Ejecutar análisis de código con SonarQube
-- task: SonarQubeAnalyze@7
+- task: SonarQubeAnalyze@5
 
 # 🔹 4️⃣ Publicar resultados del análisis en SonarQube
-- task: SonarQubePublish@7
+- task: SonarQubePublish@5
   inputs:
     pollingTimeoutSec: '300'
 
