@@ -25,7 +25,8 @@ steps:
     projectName: 'ControlAsistencia_XCF_App'
     extraProperties: |
       sonar.host.url=http://localhost:9000
-      sonar.sources=server
+      sonar.cs.vscoveragexml.reportsPaths=$(Agent.TempDirectory)/**/*.coveragexml
+      sonar.coverageReportPaths=$(Agent.TempDirectory)/**/*.xml
 
 
 # 🔹 2️⃣ Compilar solución
@@ -49,3 +50,13 @@ steps:
   inputs:
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
+    testRunTitle: 'Unit Tests'
+    resultsFolder: '$(Agent.TempDirectory)\TestResults'
+
+- task: DotNetCoreCLI@2
+  displayName: 'Ejecutar pruebas con cobertura'
+  inputs:
+    command: 'test'
+    projects: '**/*Tests/*.csproj'
+    arguments: '--configuration $(buildConfiguration) --collect:"XPlat Code Coverage"'
+
