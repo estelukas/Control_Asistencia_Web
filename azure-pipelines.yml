@@ -2,8 +2,8 @@ trigger:
 - ControlAsistencia  # 🔹 Habilita CI en la rama principal
 
 pool:
-  vmImage: 'windows-latest'
-  #name: Default
+ # vmImage: 'windows-latest'
+  name: Default
 
 variables:
   solution: '**/*.sln'
@@ -17,16 +17,16 @@ steps:
   inputs:
     restoreSolution: '$(solution)'
 
-# 🔹 1️⃣ Preparar análisis con SonarQube
 - task: SonarQubePrepare@7
   inputs:
-    SonarQube: 'SonarQube'  # ⚠️ Reemplaza con el nombre de tu conexión en Azure DevOps
+    SonarQube: 'SonarQube'  # ⚠️ Debe coincidir con el nombre de la conexión en Azure DevOps
     scannerMode: 'dotnet'
     projectKey: 'ControlAsistencia_XCF_App_Control_Asistencia_f2a51de7-37ac-469b-954d-9e549b24489a'
     projectName: 'ControlAsistencia_XCF_App'
     extraProperties: |
-      sonar.host.url=http://localhost:9000
+      sonar.host.url=http://192.168.1.100:9000  
       sonar.sources=server
+
 
 # 🔹 2️⃣ Compilar solución
 - task: VSBuild@1
