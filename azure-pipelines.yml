@@ -26,6 +26,7 @@ steps:
     extraProperties: |
       sonar.host.url=http://localhost:9000
       sonar.coverageReportPaths=$(Agent.TempDirectory)/**/*.xml
+      sonar.branch.name=
 
 
 # 🔹 2️⃣ Compilar solución
