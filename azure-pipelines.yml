@@ -18,7 +18,7 @@ steps:
     restoreSolution: '$(solution)'
 
 # 🔹 1️⃣ Preparar análisis con SonarQube
-- task: SonarQubePrepare@5
+- task: SonarQubePrepare@7
   inputs:
     SonarQube: 'SonarQube'  # ⚠️ Reemplaza con el nombre de tu conexión en Azure DevOps
     scannerMode: 'dotnet'
@@ -37,10 +37,10 @@ steps:
     configuration: '$(buildConfiguration)'
 
 # 🔹 3️⃣ Ejecutar análisis de código con SonarQube
-- task: SonarQubeAnalyze@5
+- task: SonarQubeAnalyze@7
 
 # 🔹 4️⃣ Publicar resultados del análisis en SonarQube
-- task: SonarQubePublish@5
+- task: SonarQubePublish@7
   inputs:
     pollingTimeoutSec: '300'
 
