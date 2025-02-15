@@ -19,13 +19,12 @@ steps:
 
 - task: SonarQubePrepare@7
   inputs:
-    SonarQube: 'SonarQube'  # ⚠️ Debe coincidir con el nombre de la conexión en Azure DevOps
+    SonarQube: 'SonarQube'
     scannerMode: 'dotnet'
     projectKey: 'ControlAsistencia_XCF_App_Control_Asistencia_f2a51de7-37ac-469b-954d-9e549b24489a'
     projectName: 'ControlAsistencia_XCF_App'
     extraProperties: |
       sonar.host.url=http://localhost:9000
-      sonar.cs.vscoveragexml.reportsPaths=$(Agent.TempDirectory)/**/*.coveragexml
       sonar.coverageReportPaths=$(Agent.TempDirectory)/**/*.xml
 
 
