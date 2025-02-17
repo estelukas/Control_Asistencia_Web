@@ -1,0 +1,68 @@
+trigger:
+- ControlAsistencia  # 🔹 Habilita CI en la rama principal
+
+pool:
+  name: Default
+
+variables:
+  solution: '**/*.sln'
+  buildPlatform: 'Any CPU'
+  buildConfiguration: 'Release'
+
+steps:
+# 🔹 1️⃣ Instalar herramientas necesarias
+- task: NuGetToolInstaller@1
+
+# 🔹 2️⃣ Restaurar paquetes NuGet
+- task: NuGetCommand@2
+  inputs:
+    restoreSolution: '$(solution)'
+
+# 🔹 3️⃣ Preparar análisis de SonarQube
+- task: SonarQubePrepare@7
+  inputs:
+    SonarQube: 'SonarQube'
+    scannerMode: 'dotnet'
+    projectKey: 'ControlAsistencia_XCF_App'
+    projectName: 'ControlAsistencia_XCF_App'
+    extraProperties: |
+      sonar.host.url=http://localhost:9000
+      sonar.cs.vscoveragexml.reportsPaths=$(Agent.TempDirectory)/TestResults/**/coverage.cobertura.xml
+
+# 🔹 4️⃣ Compilar la solución
+- task: VSBuild@1
+  inputs:
+    solution: '$(solution)'
+    msbuildArgs: '/p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:DesktopBuildPackageLocation="$(build.artifactStagingDirectory)\WebApp.zip" /p:DeployIisAppPath="Default Web Site"'
+    platform: '$(buildPlatform)'
+    configuration: '$(buildConfiguration)'
+
+# 🔹 5️⃣ Ejecutar pruebas con cobertura (Usando Coverlet para generar cobertura en formato Cobertura)
+- task: DotNetCoreCLI@2
+  displayName: '🧪 Ejecutar pruebas con cobertura'
+  inputs:
+    command: 'test'
+    projects: '**/*Tests/*.csproj'
+    arguments: '--configuration $(buildConfiguration) /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:CoverletOutput=$(Agent.TempDirectory)/TestResults/coverage.cobertura.xml'
+
+# 🔹 6️⃣ Verificar si coverage.cobertura.xml se generó correctamente
+- powershell: |
+    Write-Host "🔍 Verificando archivos en $(Agent.TempDirectory)/TestResults:"
+    Get-ChildItem -Path "$(Agent.TempDirectory)/TestResults" -Recurse | ForEach-Object { Write-Host $_.FullName }
+  displayName: '🔍 Verificar archivos de cobertura'
+
+# 🔹 7️⃣ Publicar cobertura de código
+- task: PublishCodeCoverageResults@1
+  displayName: '📊 Publicar cobertura de código'
+  inputs:
+    codeCoverageTool: 'Cobertura'
+    summaryFileLocation: '$(Agent.TempDirectory)/TestResults/coverage.cobertura.xml'
+    reportDirectory: '$(Agent.TempDirectory)/TestResults'
+
+# 🔹 8️⃣ Ejecutar análisis de código con SonarQube
+- task: SonarQubeAnalyze@7
+
+# 🔹 9️⃣ Publicar resultados del análisis en SonarQube
+- task: SonarQubePublish@7
+  inputs:
+    pollingTimeoutSec: '300'
