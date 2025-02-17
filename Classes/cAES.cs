@@ -12,7 +12,7 @@ namespace XCF_Web_Control_Asistencia.Classes
         /// Encriptar datos.
         /// </summary>
         /// <param name="dato"></param>
-        /// <returns></returns> 
+        /// <returns></returns>
         public static byte[] Encriptar(string dato)
         {
             return EncryptStringToBytes_Aes(dato, _key, Enumerable.Repeat(0, 16).Select(_ => (byte)new Random().Next(256)).ToArray());
