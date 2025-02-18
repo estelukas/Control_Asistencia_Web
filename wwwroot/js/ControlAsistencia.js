@@ -224,25 +224,25 @@ const inicializarCamara = async () => {
             videoElement.style.transform = "none";
         }
 
-        video.addEventListener('play', async () => {
-            const displaySize = { width: canvas.width, height: canvas.height };
-            faceapi.matchDimensions(canvas, displaySize);
-            setInterval(async () => {
-                const detection = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions());
-                const resizedDetections = faceapi.resizeResults(detection, displaySize);
-                canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
-                const ctx = canvas.getContext('2d');
-                resizedDetections.forEach(det => {
-                    const { x, y, width, height } = det.box;
-                    ctx.beginPath();
-                    ctx.rect(x, y, width, height);
-                    ctx.lineWidth = 2;
-                    ctx.strokeStyle = "red";
-                    ctx.stroke();
-                })
-            }, 100);
+        //video.addEventListener('play', async () => {
+        //    const displaySize = { width: canvas.width, height: canvas.height };
+        //    faceapi.matchDimensions(canvas, displaySize);
+        //    setInterval(async () => {
+        //        const detection = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions());
+        //        const resizedDetections = faceapi.resizeResults(detection, displaySize);
+        //        canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
+        //        const ctx = canvas.getContext('2d');
+        //        resizedDetections.forEach(det => {
+        //            const { x, y, width, height } = det.box;
+        //            ctx.beginPath();
+        //            ctx.rect(x, y, width, height);
+        //            ctx.lineWidth = 2;
+        //            ctx.strokeStyle = "red";
+        //            ctx.stroke();
+        //        })
+        //    }, 500);
 
-        });
+        //});
 
 
 
