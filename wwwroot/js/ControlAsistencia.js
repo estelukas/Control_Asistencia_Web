@@ -191,9 +191,9 @@ const solicitarPermisoCamara = async () => {
 const inicializarCamara = async () => {
     try {
         await Promise.all([
-            faceapi.nets.tinyFaceDetector.loadFromUri('/asistencia/models'),
-            faceapi.nets.faceLandmark68Net.loadFromUri('/asistencia/models'),
-            faceapi.nets.faceRecognitionNet.loadFromUri('/asistencia/models')
+            faceapi.nets.tinyFaceDetector.loadFromUri('/models'),
+            faceapi.nets.faceLandmark68Net.loadFromUri('/models'),
+            faceapi.nets.faceRecognitionNet.loadFromUri('/models')
         ]);
         // Obtener los elementos del DOM
         const videoElement = document.getElementById('video');
@@ -224,25 +224,25 @@ const inicializarCamara = async () => {
             videoElement.style.transform = "none";
         }
 
-        video.addEventListener('play', async () => {
-            const displaySize = { width: canvas.width, height: canvas.height };
-            faceapi.matchDimensions(canvas, displaySize);
-            setInterval(async () => {
-                const detection = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions());
-                const resizedDetections = faceapi.resizeResults(detection, displaySize);
-                canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
-                const ctx = canvas.getContext('2d');
-                resizedDetections.forEach(det => {
-                    const { x, y, width, height } = det.box;
-                    ctx.beginPath();
-                    ctx.rect(x, y, width, height);
-                    ctx.lineWidth = 2;
-                    ctx.strokeStyle = "red";
-                    ctx.stroke();
-                })
-            }, 100);
+        //video.addEventListener('play', async () => {
+        //    const displaySize = { width: canvas.width, height: canvas.height };
+        //    faceapi.matchDimensions(canvas, displaySize);
+        //    setInterval(async () => {
+        //        const detection = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions());
+        //        const resizedDetections = faceapi.resizeResults(detection, displaySize);
+        //        canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
+        //        const ctx = canvas.getContext('2d');
+        //        resizedDetections.forEach(det => {
+        //            const { x, y, width, height } = det.box;
+        //            ctx.beginPath();
+        //            ctx.rect(x, y, width, height);
+        //            ctx.lineWidth = 2;
+        //            ctx.strokeStyle = "red";
+        //            ctx.stroke();
+        //        })
+        //    }, 500);
 
-        });
+        //});
 
 
 
@@ -755,9 +755,9 @@ const capturarImagen = async () => {
 
     if (fotoRH) {
 
-        await faceapi.nets.tinyFaceDetector.loadFromUri('/asistencia/models');
-        await faceapi.nets.faceLandmark68Net.loadFromUri('/asistencia/models');
-        await faceapi.nets.faceRecognitionNet.loadFromUri('/asistencia/models');
+        await faceapi.nets.tinyFaceDetector.loadFromUri('/models');
+        await faceapi.nets.faceLandmark68Net.loadFromUri('/models');
+        await faceapi.nets.faceRecognitionNet.loadFromUri('/models');
 
 
         // Obtener imágenes
