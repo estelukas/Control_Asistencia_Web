@@ -224,25 +224,37 @@ const inicializarCamara = async () => {
             videoElement.style.transform = "none";
         }
 
-        //video.addEventListener('play', async () => {
-        //    const displaySize = { width: canvas.width, height: canvas.height };
-        //    faceapi.matchDimensions(canvas, displaySize);
-        //    setInterval(async () => {
-        //        const detection = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions());
-        //        const resizedDetections = faceapi.resizeResults(detection, displaySize);
-        //        canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
-        //        const ctx = canvas.getContext('2d');
-        //        resizedDetections.forEach(det => {
-        //            const { x, y, width, height } = det.box;
-        //            ctx.beginPath();
-        //            ctx.rect(x, y, width, height);
-        //            ctx.lineWidth = 2;
-        //            ctx.strokeStyle = "red";
-        //            ctx.stroke();
-        //        })
-        //    }, 500);
+        video.addEventListener('play', async () => {
+            const displaySize = { width: canvas.width, height: canvas.height };
+            faceapi.matchDimensions(canvas, displaySize);
 
-        //});
+            const tinyFaceDetectorOptions = new faceapi.TinyFaceDetectorOptions({ inputSize: 256, scoreThreshold: 0.5 }); // Ajusta el tamaño y el umbral
+            let lastDetectionTime = 0;
+
+            function detect() {
+                const currentTime = Date.now();
+
+                // Evitar ejecutar la detección demasiado rápido
+                if (currentTime - lastDetectionTime < 100) return; // Ejecutar solo una vez cada 100ms
+                lastDetectionTime = currentTime;
+
+                faceapi.detectAllFaces(video, tinyFaceDetectorOptions).then(detections => {
+                    const resizedDetections = faceapi.resizeResults(detections, displaySize);
+                    canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height); // Solo limpiar cuando sea necesario
+                    const ctx = canvas.getContext('2d');
+                    resizedDetections.forEach(det => {
+                        const { x, y, width, height } = det.box;
+                        ctx.beginPath();
+                        ctx.rect(x, y, width, height);
+                        ctx.lineWidth = 2;
+                        ctx.strokeStyle = "red";
+                        ctx.stroke();
+                    });
+                });
+            }
+
+            setInterval(detect, 100); // Ajustar el intervalo para balancear rendimiento y precisión
+        });
 
 
 
@@ -904,7 +916,7 @@ function AlertStackingWithIcon_Mostrar(Color, Texto, Icono) {
     const alert = document.createElement('div');
     alert.innerHTML = `
         <i class="fas ${Icono} me-3"></i>${Texto}
-        <button type="button" class="btn-close" data-mdb-dismiss="alert" aria-label="Close"></button>
+<button type="button" class="btn-close" data-mdb-dismiss="alert" aria-label="Close"></button>
     `;
     alert.classList.add('alert', 'fade', 'alert-dismissible');
     document.body.appendChild(alert);
@@ -921,8 +933,8 @@ function AlertStackingWithIcon_Mostrar(Color, Texto, Icono) {
     alertInstance.show();
 
     //Sirve para eliminarlo del html una vez termine de aparecer la notificación
-    setTimeout(() => {
-        alertInstance.close();
+        setTimeout(() => {
+            alertInstance.close();
     }, 5000);
 }
 
