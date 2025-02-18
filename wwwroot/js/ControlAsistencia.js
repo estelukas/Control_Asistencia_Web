@@ -1,9 +1,7 @@
 ﻿//#region Variables Mobiles
 let android = window.Android;
 
-const isMobile = () => {
-    return Boolean(android)
-}
+const isMobile = () => Boolean(android);
 
 //#endregion Variables Mobiles
 
@@ -23,17 +21,16 @@ let EstaEnGeocerca = 0;
 let IdCentroServicio = 0;
 let CentroServicio = '';
 let htmlContent;
-$(document).ready(() => {
-    let esBrave = (navigator.brave !== undefined);
+document.addEventListener("DOMContentLoaded", async () => {
+    console.log("Tiempo total de carga:", performance.now(), "ms");
 
-    if (esBrave) {
-        var userAgent = navigator.userAgent;
+    const isBrave = (navigator.brave !== undefined);
+
+    if (isBrave) {
+        let userAgent = navigator.userAgent;
         // 1. Detección por User Agent
-        var isChrome = /Chrome/.test(userAgent) &&
+        let isChrome = /Chrome/.test(userAgent) &&
             !/Edg|Opera|OPR/.test(userAgent); // Excluye Edge, Opera
-
-        // 2. Detección específica de Brave (usando API del navegador)
-        var isBrave = typeof navigator.brave !== 'undefined';
 
         // Si NO es Chrome o SI es Brave
         if (!isChrome || isBrave) {
@@ -193,9 +190,11 @@ const solicitarPermisoCamara = async () => {
 // Función para inicializar la cámara
 const inicializarCamara = async () => {
     try {
-        await faceapi.nets.tinyFaceDetector.loadFromUri(window.location.origin + '/asistencia/models');
-        await faceapi.nets.faceLandmark68Net.loadFromUri(window.location.origin + '/asistencia/models');
-        await faceapi.nets.faceRecognitionNet.loadFromUri(window.location.origin + '/asistencia/models');
+        await Promise.all([
+            faceapi.nets.tinyFaceDetector.loadFromUri('/asistencia/models'),
+            faceapi.nets.faceLandmark68Net.loadFromUri('/asistencia/models'),
+            faceapi.nets.faceRecognitionNet.loadFromUri('/asistencia/models')
+        ]);
         // Obtener los elementos del DOM
         const videoElement = document.getElementById('video');
         const canvas = document.getElementById("canvas");
@@ -213,7 +212,7 @@ const inicializarCamara = async () => {
         videoElement.addEventListener("loadeddata", () => {
             canvas.width = videoElement.videoWidth;
             canvas.height = videoElement.videoHeight;
-         
+
         });
 
         // Detectar si es necesario aplicar un flip horizontal
@@ -225,10 +224,8 @@ const inicializarCamara = async () => {
             videoElement.style.transform = "none";
         }
 
-        video.addEventListener('play', async () =>
-        {
+        video.addEventListener('play', async () => {
             const displaySize = { width: canvas.width, height: canvas.height };
-            console.log(displaySize);
             faceapi.matchDimensions(canvas, displaySize);
             setInterval(async () => {
                 const detection = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions());
@@ -248,7 +245,7 @@ const inicializarCamara = async () => {
         });
 
 
-       
+
         // Evento para capturar imagen al hacer clic en el botón
         const botonCaptura = document.getElementById("Registrar");
         botonCaptura.addEventListener("click", capturarImagen);
@@ -383,24 +380,11 @@ const verificarPermisos = () => {
 
 // Cargar dinámicamente el Partial View
 const cargarControlAsistencia = async (estaEnGeocerca) => {
-    try {
-        const url = $("#urlCargarControlAsistencia").data("action-url");
-
-        const response = await fetch(`${url}?estaEnGeocerca=${estaEnGeocerca}`, {
-            method: "GET",
-        });
-
-        if (response.ok) {
-            const htmlContent = await response.text();
-            // Renderiza el contenido parcial pero no lo muestra aún
-            $("#controlAsistenciaContainer").html(htmlContent);
-            $('#controlAsistenciaContainer').show();
-            $("#centroServicio").text(jsonResponse[0].Nombre)
-        } else {
-            throw new Error(`Error al cargar el control de asistencia: ${response.statusText}`);
-        }
-    } catch (error) {
-        console.error("Error al cargar el control de asistencia:", error);
+    const url = `${$("#urlCargarControlAsistencia").data("action-url")}?estaEnGeocerca=${estaEnGeocerca}`;
+    const content = await fetchData(url);
+    if (content) {
+        $("#controlAsistenciaContainer").html(content).show();
+        $("#centroServicio").text(jsonResponse[0]?.Nombre || '');
     }
 };
 
@@ -410,33 +394,10 @@ const cargarControlAsistencia = async (estaEnGeocerca) => {
 
 
 const cargarContenedorCamara = async () => {
-    try {
-        const response = await fetch($("#urlCargarContenedorCamara").data("action-url"), {
-            method: "GET",
-            headers: {
-                "Content-Type": "text/html",
-            },
-        });
-
-        if (response.ok) {
-            const htmlContent = await response.text();
-            // Cargar el contenido dinámico en el contenedor
-            $("#divContenedorCamaraContainer").html(htmlContent);
-
-            // Asegúrate de que se muestre
-            $("#divContenedorCamaraContainer").show().css({
-                display: "block",
-                visibility: "visible",
-                opacity: "1",
-            });
-
-            // Asociar eventos después de cargar
-            document.getElementById("recargarButtonCamara").addEventListener("click", solicitarPermisoCamara);
-        } else {
-            console.error("Error al cargar el partial view del contenedor de cámara:", response.statusText);
-        }
-    } catch (error) {
-        console.error("Error al cargar el contenedor de cámara:", error);
+    const content = await fetchData($("#urlCargarContenedorCamara").data("action-url"));
+    if (content) {
+        $("#divContenedorCamaraContainer").html(content).show();
+        $("#recargarButtonCamara").on("click", solicitarPermisoCamara);
     }
 };
 
@@ -522,7 +483,7 @@ const EmpleadoConsultarDatosSelectData = async (searchTerm = "") => {
 
             } else {
                 $('#Select_SearchEmpleado').empty();
-              //  $('#select-dropdown-container-Select_SearchEmpleado .select-no-results').show();
+                //  $('#select-dropdown-container-Select_SearchEmpleado .select-no-results').show();
                 $('#Select_SearchEmpleado').prop('disabled', false);
             }
         } else {
@@ -568,9 +529,9 @@ $(document).on('input', '.form-control.select-filter-input', function () {
         EmpleadoConsultarDatosSelectData(searchTerm); // Llama a la función de búsqueda
     } else if (searchTerm.length === 0) {
         // Si no hay texto, limpiar el select, eliminar "Sin datos" y ocultar "Sin resultados"
-     //   $('#Select_SearchEmpleado').empty(); // Limpiar el select completamente
-     //   $('#Select_SearchEmpleado').prop('disabled', false); // Asegurarse de que el select esté habilitado
-     //   $('#select-dropdown-container-Select_SearchEmpleado .select-no-results').hide(); // Ocultar "Sin resultados"
+        //   $('#Select_SearchEmpleado').empty(); // Limpiar el select completamente
+        //   $('#Select_SearchEmpleado').prop('disabled', false); // Asegurarse de que el select esté habilitado
+        //   $('#select-dropdown-container-Select_SearchEmpleado .select-no-results').hide(); // Ocultar "Sin resultados"
     }
 });
 
@@ -682,13 +643,12 @@ async function cargarImagenFTP() {
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify({               
+            body: JSON.stringify({
                 Rfc: rfc
             })
         });
         if (response.ok) {
-            const result = await response.json();   
-            console.log(result);
+            const result = await response.json();
             if (result.id) {
                 // 🟢 Convertir la respuesta JSON en un objeto
                 const contenidoObj = JSON.parse(result.contenido);
@@ -770,7 +730,7 @@ const capturarImagen = async () => {
     // Convertir el contenido del canvas a un archivo PNG
     const imageData = tempCanvas.toDataURL("image/png");
     img1.src = imageData;
-   
+
 
     let rfc = $('#Select_SearchEmpleado').val();
     let ClaveEmpleado = $('#Select_SearchEmpleado option:selected').text();
@@ -795,10 +755,10 @@ const capturarImagen = async () => {
 
     if (fotoRH) {
 
-        await faceapi.nets.tinyFaceDetector.loadFromUri(window.location.origin + '/asistencia/models');
-        await faceapi.nets.faceLandmark68Net.loadFromUri(window.location.origin + '/asistencia/models');
-        await faceapi.nets.faceRecognitionNet.loadFromUri(window.location.origin + '/asistencia/models');
-       
+        await faceapi.nets.tinyFaceDetector.loadFromUri('/asistencia/models');
+        await faceapi.nets.faceLandmark68Net.loadFromUri('/asistencia/models');
+        await faceapi.nets.faceRecognitionNet.loadFromUri('/asistencia/models');
+
 
         // Obtener imágenes
         const img11 = document.getElementById("fotoCamara");
@@ -820,10 +780,10 @@ const capturarImagen = async () => {
             // Definir un umbral (ajusta según tu caso)
             const threshold = 0.6;
             if (distance < threshold) {
-               // console.log('Los rostros son de la misma persona. Distancia: ' + distance.toFixed(2));
+                // console.log('Los rostros son de la misma persona. Distancia: ' + distance.toFixed(2));
                 SonIguales = true;
             } else {
-               // console.log('Los rostros son de personas diferentes. Distancia: ' + distance.toFixed(2));
+                // console.log('Los rostros son de personas diferentes. Distancia: ' + distance.toFixed(2));
                 SonIguales = false;
             }
         } else {
@@ -864,11 +824,11 @@ const capturarImagen = async () => {
                 resetearFormulario();
                 AlertStackingWithIcon_Mostrar("warning", result.contenido, "fa-times-circle");
                 quitLoadingButton("#Registrar");
-               // SonIguales = false;
+                // SonIguales = false;
             }
         } else {
             throw new Error('Error al guardar la imagen.');
-           // SonIguales = false;
+            // SonIguales = false;
         }
     } catch (error) {
         console.error('Error:', error);
@@ -1023,20 +983,28 @@ function quitLoadingButton(id) {
 
 //#region Stop Camara
 
-function stopCamera(videoElement) {
-    if (videoElement.srcObject) {
-        let stream = videoElement.srcObject;
-        let tracks = stream.getTracks();
-
-        tracks.forEach(track => track.stop()); // Detiene cada pista (audio/video)
-        videoElement.srcObject = null; // Limpia el objeto de la cámara
-    }
-}
-
 window.addEventListener("beforeunload", () => {
     const videoElement = document.getElementById('video');
-
-    stopCamera(videoElement);
+    if (videoElement?.srcObject) {
+        videoElement.srcObject.getTracks().forEach(track => track.stop());
+        videoElement.srcObject = null;
+    }
 });
 
 //#endregion Stop Camara
+
+const fetchData = async (url, method = "GET", body = null) => {
+    try {
+        const options = {
+            method,
+            headers: { "Content-Type": "application/json" },
+            body: body ? JSON.stringify(body) : null
+        };
+        const response = await fetch(url, options);
+        if (!response.ok) throw new Error(`Error ${response.status}: ${response.statusText}`);
+        return response.text();
+    } catch (error) {
+        console.error("Error en fetch:", error);
+        return null;
+    }
+};

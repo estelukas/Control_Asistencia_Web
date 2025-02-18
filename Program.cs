@@ -1,19 +1,22 @@
 using Newtonsoft.Json;
 using XCF_Web_Control_Asistencia.Classes;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.AspNetCore.Mvc.ViewEngines;
-using Microsoft.AspNetCore.Mvc.ViewFeatures;
-using System.IO;
-using Microsoft.AspNetCore.Mvc.Abstractions;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.Caching.Distributed;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Cargar configuraciones desde appsettings.json y variables de entorno
 builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
                       .AddEnvironmentVariables();
+
+builder.Services.AddResponseCompression(options =>
+{
+    options.EnableForHttps = true;
+});
+
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
+builder.Logging.AddDebug();
+
 
 // Obtener el valor del ambiente desde la configuración
 var ambiente = builder.Configuration["Ambiente"];
@@ -46,35 +49,51 @@ app.UseAuthorization();
 //app.UseSession();
 app.UseStaticFiles(new StaticFileOptions
 {
-    ServeUnknownFileTypes = true, // Permite archivos binarios
+    ServeUnknownFileTypes = true
 });
+
 // Middleware para la verificación de navegador
 app.Use(async (context, next) =>
 {
-    var userAgent = context.Request.Headers["User-Agent"].ToString();
+    var cacheKey = $"browser-check-{context.Connection.Id}";
+    var cache = context.RequestServices.GetRequiredService<IDistributedCache>();
 
-    bool esChrome = userAgent.Contains("Chrome") || userAgent.Contains("CriOS");
-    bool esEdge = userAgent.Contains("Edg");
-    bool esBrave = userAgent.Contains("Brave");
-    bool esSafariPuro = userAgent.Contains("Safari") && !userAgent.Contains("Chrome") && !userAgent.Contains("CriOS");
-
-    // Permitir solo Chrome (incluyendo Chrome en iOS "CriOS") y Safari puro, y bloquear Edge y Brave
-    if (!(esChrome || esSafariPuro) || esEdge || esBrave)
+    var cachedResponse = await cache.GetStringAsync(cacheKey);
+    if (cachedResponse != null)
     {
-        // Renderizar el Partial View si no es Chrome o Safari puro
-        context.Response.StatusCode = 200;
+        context.Response.StatusCode = 403;
         context.Response.ContentType = "text/html";
-        var partialViewContent = await ViewRenderHelper.RenderPartialViewToString(context, "_UnsupportedBrowser");
-        await context.Response.WriteAsync(partialViewContent);
+        await context.Response.WriteAsync(cachedResponse);
+        return;
     }
-    else
+
+    var userAgent = context.Request.Headers["User-Agent"].ToString();
+    bool esChrome = userAgent.Contains("Chrome") || userAgent.Contains("CriOS");
+    bool esSafariPuro = userAgent.Contains("Safari") && !userAgent.Contains("Chrome");
+
+    if (!(esChrome || esSafariPuro))
     {
-        // Continuar con el pipeline normal si es Chrome
-        await next();
+        var partialViewContent = await ViewRenderHelper.RenderPartialViewToString(context, "_UnsupportedBrowser");
+        await cache.SetStringAsync(cacheKey, partialViewContent, new DistributedCacheEntryOptions
+        {
+            AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10)
+        });
+
+        context.Response.StatusCode = 403;
+        context.Response.ContentType = "text/html";
+        await context.Response.WriteAsync(partialViewContent);
+        return;
     }
+
+    await next();
 });
+
 // Verifica si el navegador es Chrome
 //app.UseSession();
+
+
+app.UseResponseCompression();
+
 
 // Configurar rutas
 app.MapControllerRoute(
