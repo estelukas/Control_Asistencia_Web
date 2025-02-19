@@ -54,8 +54,8 @@ document.addEventListener("DOMContentLoaded", async () => {
                 loadingScreen();
         });
         if (!isMobile()) {
-            loadingScreen();
-        }
+             loadingScreen();
+         }
     }
 });
 
@@ -95,56 +95,88 @@ const cargarContenedorWebNoSoportado = async () => {
 
 // Solicitar permisos de ubicación
 const solicitarPermisoUbicacion = async () => {
-    if (navigator.geolocation) {
-        try {
-            // Convertimos getCurrentPosition en una Promesa
-            const position = await new Promise((resolve, reject) => {
-                navigator.geolocation.getCurrentPosition(resolve, reject);
-            });
+    if (!navigator.geolocation) {
+        AlertStackingWithIcon_Mostrar("danger", "Tu navegador no soporta la geolocalización.", "fa-times-circle");
+        $('#divContenedorGps').show();
+        return;
+    }
 
-            // Llamamos a ConsultarGeocerca con await
-            await ConsultarGeocerca(position.coords.latitude, position.coords.longitude);
+    try {
+        // Verificar si el usuario ya concedió permisos
+        const permiso = await navigator.permissions.query({ name: "geolocation" });
 
-            if (EstaEnGeocerca == 1) {
-                $('#divContenedorGps').hide();
-                $('#divContenedorCamara').show();
-                // Evitar recargar en un ciclo
-                await solicitarPermisoCamara();
-            } else {
-                $('#divContenedorGps').hide().css({ 'display': 'none', 'visibility': 'hidden', });
-                document.getElementById("divContenedorErrorGeocercaContainer").innerHTML = `
-                    <div class="container py-4">
-                        <div class="card shadow-lg p-3 mb-4 bg-body rounded border border-warning mx-auto" style="max-width: 600px; width: 100%;">
-                            <div class="card-body text-center py-3">
-                                <p>
-                                    <i class="fas fa-7x fa-map-marked-alt text-danger"></i>
-                                </p>
-                                <h2 class="mb-3 text-danger">No estás en una geocerca válida</h2>
-                                <p style="font-size: 18px;">
-                                    Para continuar, <strong>debes estar dentro de una geocerca válida.</strong>
-                                </p>
-                            </div>
-                            <div class="container d-flex align-items-center justify-content-center py-3">
-                                <button id="recargarButtonGeocerca" class="btn btn-warning">Intentar de nuevo</button>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            }
-        } catch (error) {
-            console.error("Error al obtener la ubicación:", error);
-            // Mostrar el div de GPS si ocurre un error o se deniega el permiso
-            if (error.code === error.PERMISSION_DENIED) {
-                $('#divContenedorGps').show();
-            } else {
-                AlertStackingWithIcon_Mostrar("danger", 'Error al intentar obtener la ubicación.', "fa-times-circle");
-                $('#divContenedorGps').show();
-            }
+        if (permiso.state === "denied") {
+            throw new Error("Permiso de ubicación denegado.");
         }
-    } else {
-        AlertStackingWithIcon_Mostrar("danger", 'Tu navegador no soporta la geolocalización.', "fa-times-circle");
+
+        // Primera solicitud: Más rápida, sin GPS preciso
+        const opcionesRapidas = {
+            enableHighAccuracy: false,
+            timeout: 5000,
+            maximumAge: 0
+        };
+
+        try {
+            const position = await obtenerUbicacion(opcionesRapidas);
+            await manejarUbicacion(position);
+        } catch (error) {
+            console.warn("Ubicación rápida falló, intentando con alta precisión...", error);
+
+            // Segunda solicitud: Activa GPS si la primera falló
+            const opcionesPrecisas = {
+                enableHighAccuracy: true,
+                timeout: 15000,  // Espera hasta 15 segundos
+                maximumAge: 0
+            };
+
+            const position = await obtenerUbicacion(opcionesPrecisas);
+            await manejarUbicacion(position);
+        }
+    } catch (error) {
+        console.error("Error al obtener la ubicación:", error);
         $('#divContenedorGps').show();
     }
+};
+
+const obtenerUbicacion = (opciones) => {
+    return new Promise((resolve, reject) => {
+        navigator.geolocation.getCurrentPosition(resolve, reject, opciones);
+    });
+};
+
+const manejarUbicacion = async (position) => {
+    await ConsultarGeocerca(position.coords.latitude, position.coords.longitude);
+
+    if (EstaEnGeocerca === 1) {
+        $('#divContenedorGps').hide();
+        $('#divContenedorCamara').show();
+        await solicitarPermisoCamara();
+    } else {
+        mostrarMensajeFueraDeGeocerca();
+    }
+};
+
+// Función para mostrar el mensaje de geocerca inválida
+const mostrarMensajeFueraDeGeocerca = () => {
+    $('#divContenedorGps').hide().css({ 'display': 'none', 'visibility': 'hidden' });
+    document.getElementById("divContenedorErrorGeocercaContainer").innerHTML = `
+        <div class="container py-4">
+            <div class="card shadow-lg p-3 mb-4 bg-body rounded border border-warning mx-auto" style="max-width: 600px; width: 100%;">
+                <div class="card-body text-center py-3">
+                    <p>
+                        <i class="fas fa-7x fa-map-marked-alt text-danger"></i>
+                    </p>
+                    <h2 class="mb-3 text-danger">No estás en una geocerca válida</h2>
+                    <p style="font-size: 18px;">
+                        Para continuar, <strong>debes estar dentro de una geocerca válida.</strong>
+                    </p>
+                </div>
+                <div class="container d-flex align-items-center justify-content-center py-3">
+                    <button id="recargarButtonGeocerca" class="btn btn-warning">Intentar de nuevo</button>
+                </div>
+            </div>
+        </div>
+    `;
 };
 
 
@@ -186,7 +218,7 @@ const solicitarPermisoCamara = async () => {
         $('#divContenedorCamara').show();
     }
 };
-
+let detectionActivated = false;
 // Función para inicializar la cámara
 const inicializarCamara = async () => {
     try {
@@ -225,6 +257,10 @@ const inicializarCamara = async () => {
         }
 
         video.addEventListener('play', async () => {
+            if (detectionActivated) {
+                return;
+            }
+            detectionActivated = true;
             const displaySize = { width: canvas.width, height: canvas.height };
             faceapi.matchDimensions(canvas, displaySize);
 
@@ -255,6 +291,7 @@ const inicializarCamara = async () => {
 
             setInterval(detect, 100); // Ajustar el intervalo para balancear rendimiento y precisión
         });
+
 
 
 
@@ -915,27 +952,39 @@ const seleccionarEntradaSalidaPorDefecto = () => {
 function AlertStackingWithIcon_Mostrar(Color, Texto, Icono) {
     const alert = document.createElement('div');
     alert.innerHTML = `
-        <i class="fas ${Icono} me-3"></i>${Texto}
+<div class="alert-content">
 <button type="button" class="btn-close" data-mdb-dismiss="alert" aria-label="Close"></button>
+<div class="alert-body text-center">
+<i class="fas ${Icono} fa-6x text-${Color} mb-3 mb-md-4"></i>
+<h2 class="alert-text text-${Color}">${Texto}</h2>
+</div>
+</div>
     `;
-    alert.classList.add('alert', 'fade', 'alert-dismissible');
+
+    alert.classList.add('alert', 'fade', 'alert-dismissible', 'shadow-lg', 'mt-5', 'col-10', 'col-md-4', 'mx-auto');
+    alert.setAttribute('role', 'alert');
+    alert.setAttribute('data-mdb-position', 'top-center');
+    alert.setAttribute('data-mdb-color', Color);
+    alert.setAttribute('data-mdb-alert-init', '');
+
     document.body.appendChild(alert);
+
     const alertInstance = new mdb.Alert(alert, {
         color: Color,
         stacking: true,
         hidden: true,
-        //width: '450px',
-        width: '400px',
-        position: 'top-center',
-        autohide: true,
-        delay: 5000,
+        offset: 10
     });
+
     alertInstance.show();
 
-    //Sirve para eliminarlo del html una vez termine de aparecer la notificación
+    reproducirAlerta(Texto, () => {
         setTimeout(() => {
             alertInstance.close();
-    }, 5000);
+        }, 1000)
+    });
+
+
 }
 
 //#endregion AlertStackingWithIcon_Mostrar
@@ -1003,6 +1052,35 @@ window.addEventListener("beforeunload", () => {
     }
 });
 
+
+let videoStream = null;
+
+function stopCamera() {
+    if (videoStream) {
+        videoStream.getTracks().forEach(track => track.stop()); // Detiene todas las pistas activas
+        videoStream = null; // Limpiamos la referencia para evitar acumulación
+    }
+}
+
+function startCamera() {
+    if (videoStream) {
+        console.log("La cámara ya está activa.");
+        return; // Evita crear múltiples instancias
+    }
+
+    navigator.mediaDevices.getUserMedia({ video: true })
+        .then(stream => {
+            let videoElement = document.querySelector("video");
+            if (videoElement) {
+                videoElement.srcObject = stream;
+                videoStream = stream; // Guardamos la referencia del stream
+            }
+        })
+        .catch(error => console.error("Error al acceder a la cámara:", error));
+}
+
+
+
 //#endregion Stop Camara
 
 const fetchData = async (url, method = "GET", body = null) => {
@@ -1020,3 +1098,28 @@ const fetchData = async (url, method = "GET", body = null) => {
         return null;
     }
 };
+
+function reproducirAlerta(mensaje, callback) {
+    if (isMobile()) {
+        android.speakText(mensaje);
+        return;
+    }
+    let speech = new SpeechSynthesisUtterance(mensaje);
+    let voces = speechSynthesis.getVoices();
+    console.log(voces)
+    let vozEspañol = voces.find(voz => voz.name.includes("Microsoft Laura - Spanish (Spain)"));
+
+    if (vozEspañol) {
+        console.log('entre')
+        speech.voice = vozEspañol;
+    }
+
+    speech.rate = 1.2;
+    speech.pitch = 1;
+
+    speech.onend = () => {
+        if (callback) callback();
+    };
+
+    speechSynthesis.speak(speech);
+}
