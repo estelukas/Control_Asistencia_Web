@@ -30,13 +30,13 @@
     </div>
 
     <!-- Inclusión de scripts necesarios -->
-    <script src="~/lib/jquery/dist/jquery.min.js" async></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js" async></script>
-    <script src="~/lib/mdbpro/js/mdb.umd.min.js?v=3" async></script> <!-- Asegúrate de que esta línea cargue el JS de MDB -->
-    <script src="~/lib/mdbpro/plugins/js/all.min.js" async></script> <!-- Scripts de plugins si es necesario -->
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/lib/mdbpro/js/mdb.umd.min.js?v=3"></script> <!-- Asegúrate de que esta línea cargue el JS de MDB -->
+    <script src="~/lib/mdbpro/plugins/js/all.min.js"></script> <!-- Scripts de plugins si es necesario -->
     <!-- Inclusión de scripts de validación jQuery -->
-    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js" async></script>
-    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js" async></script>
+@*     <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script> *@
 
     @await RenderSectionAsync("Scripts", required: false)
 </body>
