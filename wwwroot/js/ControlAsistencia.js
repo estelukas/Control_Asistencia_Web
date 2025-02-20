@@ -774,7 +774,6 @@ const capturarImagen = async () => {
 
     tempContext.restore();
     const img1 = document.getElementById("fotoCamara");
-    await cargarImagenFTP();
 
     // Convertir el contenido del canvas a un archivo PNG
     const imageData = tempCanvas.toDataURL("image/png");
@@ -800,6 +799,8 @@ const capturarImagen = async () => {
         AlertStackingWithIcon_Mostrar("warning", 'Debes escribir tu clave de empleado', "fa-times-circle");
         quitLoadingButton("#Registrar")
         return false;
+    } else {
+        await cargarImagenFTP();
     }
 
     if (fotoRH) {
@@ -865,7 +866,7 @@ const capturarImagen = async () => {
             const result = await response.json();
             if (result.id) {
                 resetearFormulario();
-                AlertStackingWithIcon_Mostrar("success", result.contenido, "fa-times-circle");
+                AlertStackingWithIcon_Mostrar("success", result.contenido, "fa-circle-check");
                 quitLoadingButton("#Registrar");
                 //SonIguales = false;
 
@@ -948,18 +949,42 @@ const seleccionarEntradaSalidaPorDefecto = () => {
 //#endregion Seleccionar Entrada Salida Por Defecto
 
 //#region AlertStackingWithIcon_Mostrar
-
+const alertInstances = {};
 function AlertStackingWithIcon_Mostrar(Color, Texto, Icono) {
+    const time = new Date().getTime().toString();
+    const overlay = document.createElement('div');
+    overlay.id = "overlay_" + time;
+    overlay.classList.add(
+        'position-fixed', 'top-0', 'start-0', 'w-100', 'h-100',
+        'd-flex', 'justify-content-center', 'align-items-center',
+        `bg-${Color}`, // Color dinámico (success, danger, etc.)
+        'opacity-15',  // Menos opacidad para el efecto modal
+        'z-index-10',   // Asegura que esté detrás de la alerta
+        'fade'          // Clase para la transición
+    );
+
     const alert = document.createElement('div');
+    const alertId = "alert_" + time;
     alert.innerHTML = `
-<div class="alert-content">
-<button type="button" class="btn-close" data-mdb-dismiss="alert" aria-label="Close"></button>
-<div class="alert-body text-center">
-<i class="fas ${Icono} fa-6x text-${Color} mb-3 mb-md-4"></i>
-<h2 class="alert-text text-${Color}">${Texto}</h2>
+<div id="${alertId}" class="alert-content p-0 d-flex flex-column justify-content-center align-items-center h-100">
+<button type="button" class="btn-close position-absolute top-0 end-0 m-2" aria-label="Close"></button>
+<div class="alert-body p-0 d-flex flex-column justify-content-center align-items-center">
+<div class="text-center">
+<i class="fas ${Icono} fa-8x text-light mb-3"></i> <!-- Icono en color blanco -->
+</div>
+<h2 class="alert-text text-center text-light m-0">${Texto}</h2> <!-- Texto en blanco -->
 </div>
 </div>
     `;
+    alert.style.height = "400px"; // Ajusta la altura de la alerta
+    alert.classList.add(
+        'alert', 'fade', 'alert-dismissible',
+        'col-10', 'col-md-4', 'mx-auto', 'p-5',
+        'position-fixed', 'top-50', 'start-50',
+        'translate-middle', 'mt-n5',
+        'shadow-lg', `bg-${Color}`, // Color dinámico en el fondo de la alerta
+        'z-index-20', 'text-light' // Asegura que la alerta esté sobre el overlay
+    );
 
     alert.classList.add('alert', 'fade', 'alert-dismissible', 'shadow-lg', 'mt-5', 'col-10', 'col-md-4', 'mx-auto');
     alert.setAttribute('role', 'alert');
@@ -967,6 +992,7 @@ function AlertStackingWithIcon_Mostrar(Color, Texto, Icono) {
     alert.setAttribute('data-mdb-color', Color);
     alert.setAttribute('data-mdb-alert-init', '');
 
+    document.body.appendChild(overlay);
     document.body.appendChild(alert);
 
     const alertInstance = new mdb.Alert(alert, {
@@ -978,13 +1004,32 @@ function AlertStackingWithIcon_Mostrar(Color, Texto, Icono) {
 
     alertInstance.show();
 
-    reproducirAlerta(Texto, () => {
+    alert.querySelector('.btn-close').addEventListener('click', () => {
+        alertInstance.close();
+        overlay.classList.remove('opacity-15'); // Remueve la opacidad antes de desaparecer
+        overlay.classList.add('fade-out'); // Agregar clase para la transición de desaparición
         setTimeout(() => {
-            alertInstance.close();
-        }, 1000)
+            overlay.remove(); // Remover el overlay después de la transición
+        }, 1000); // Duración del efecto fade-out
     });
 
+    alertInstances[alertId] = alertInstance;
+    reproducirAlerta(Texto, time);
 
+
+}
+
+function callbackAlert(timeId) {
+    const alertId = "alert_" + timeId;
+    const overlayId = "overlay_" + timeId;
+    const overlay = document.getElementById(overlayId);
+
+    if (alertInstances[alertId]) {
+        setTimeout(() => {
+            alertInstances[alertId].close(); overlay.remove();
+            delete alertInstances[alertId]; // Eliminamos la instancia
+        }, 1000);
+    }
 }
 
 //#endregion AlertStackingWithIcon_Mostrar
@@ -1064,7 +1109,6 @@ function stopCamera() {
 
 function startCamera() {
     if (videoStream) {
-        console.log("La cámara ya está activa.");
         return; // Evita crear múltiples instancias
     }
 
@@ -1099,18 +1143,16 @@ const fetchData = async (url, method = "GET", body = null) => {
     }
 };
 
-function reproducirAlerta(mensaje, callback) {
+function reproducirAlerta(mensaje, alertId) {
     if (isMobile()) {
-        android.speakText(mensaje);
+        android.speakText(mensaje, alertId);
         return;
     }
     let speech = new SpeechSynthesisUtterance(mensaje);
     let voces = speechSynthesis.getVoices();
-    console.log(voces)
     let vozEspañol = voces.find(voz => voz.name.includes("Microsoft Laura - Spanish (Spain)"));
 
     if (vozEspañol) {
-        console.log('entre')
         speech.voice = vozEspañol;
     }
 
@@ -1118,8 +1160,30 @@ function reproducirAlerta(mensaje, callback) {
     speech.pitch = 1;
 
     speech.onend = () => {
-        if (callback) callback();
+        callbackAlert(alertId);
     };
 
     speechSynthesis.speak(speech);
 }
+
+//#region Manual
+
+$(document).on("click", ".manual-usuario", function (e) {
+    e.preventDefault(); // Evita el comportamiento por defecto del enlace
+
+    let url = $(this).attr("href");
+
+    if (isMobile()) {
+        let link = document.createElement("a");
+        link.href = url;
+        link.setAttribute("download", url.split('/').pop()); // Extrae el nombre del archivo para la descarga
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    } else {
+        window.open(url, "_blank"); // Abre en una nueva pestaña
+    }
+});
+
+
+//#endregion Manual
