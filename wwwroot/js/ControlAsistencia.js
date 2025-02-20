@@ -223,9 +223,9 @@ let detectionActivated = false;
 const inicializarCamara = async () => {
     try {
         await Promise.all([
-            faceapi.nets.tinyFaceDetector.loadFromUri('/models'),
-            faceapi.nets.faceLandmark68Net.loadFromUri('/models'),
-            faceapi.nets.faceRecognitionNet.loadFromUri('/models')
+            faceapi.nets.tinyFaceDetector.loadFromUri('/asistencia/models'),
+            faceapi.nets.faceLandmark68Net.loadFromUri('/asistencia/models'),
+            faceapi.nets.faceRecognitionNet.loadFromUri('/asistencia/models')
         ]);
         // Obtener los elementos del DOM
         const videoElement = document.getElementById('video');
@@ -805,9 +805,9 @@ const capturarImagen = async () => {
 
     if (fotoRH) {
 
-        await faceapi.nets.tinyFaceDetector.loadFromUri('/models');
-        await faceapi.nets.faceLandmark68Net.loadFromUri('/models');
-        await faceapi.nets.faceRecognitionNet.loadFromUri('/models');
+        await faceapi.nets.tinyFaceDetector.loadFromUri('/asistencia/models');
+        await faceapi.nets.faceLandmark68Net.loadFromUri('/asistencia/models');
+        await faceapi.nets.faceRecognitionNet.loadFromUri('/asistencia/models');
 
 
         // Obtener imágenes
