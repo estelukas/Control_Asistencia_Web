@@ -53,9 +53,9 @@ document.addEventListener("DOMContentLoaded", async () => {
             if (isMobile())
                 loadingScreen();
         });
-        /* if (!isMobile()) {
+         if (!isMobile()) {
              loadingScreen();
-         }*/
+         }
     }
 });
 
